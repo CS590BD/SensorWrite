@@ -29,18 +29,14 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+
 @Path("/hbase")
 public class HBaseService {
 		
-	//Local Cloudera
-	private final String HBASE_ZOOKEEPER_QUORUM_IP = "192.168.101.129";
+	private final String HBASE_ZOOKEEPER_QUORUM_IP = "localhost.localdomain";
 	private final String HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181";
 	private final String HBASE_MASTER = HBASE_ZOOKEEPER_QUORUM_IP + ":60010";
-
-	//UMKC Cloudera
-	//private final String HBASE_ZOOKEEPER_QUORUM_IP = "134.193.136.147";
-	//private final String HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181";
-	//private final String HBASE_MASTER = HBASE_ZOOKEEPER_QUORUM_IP + ":60010";
 
 	/**
 	 * CREATE
@@ -53,60 +49,69 @@ public class HBaseService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/create/{tablename:.+}/{columnFamilies:.+}")
-	public String create(@PathParam("tablename") String tablename,
+	public String createTable(@PathParam("tablename") String tablename,
 			@PathParam("columnFamilies") String columnFamilies) {
-
 		String line = "{'status':'init'}";
 		HBaseAdmin hba = null;
 		Configuration config = getHBaseConfiguration();
-
 		try {
-
 			// create a table
 			HTableDescriptor ht = new HTableDescriptor(tablename);
 			// add columns
 			for (String columnFamily : columnFamilies.split(":")) {
 				ht.addFamily(new HColumnDescriptor(columnFamily));
 			}
-
 			try { // save the table
 				hba = new HBaseAdmin(config);
 				hba.createTable(ht);
 				line = "{'status':'ok'}";
-			} catch (MasterNotRunningException e) {
-				line = "{'status':'fail','exception':'MasterNotRunningException','msg':'"
-						+ e.getMessage() + "'}";
-				e.printStackTrace();
-			} catch (ZooKeeperConnectionException e) {
-				line = "{'status':'fail','exception':'ZooKeeperConnectionException','msg':'"
-						+ e.getMessage() + "'}";
-				e.printStackTrace();
-			} catch (IOException e) {
-				line = "{'status':'fail','exception':'IOException','msg':'"
-						+ e.getMessage() + "'}";
-				e.printStackTrace();
-			} catch (NullPointerException e) {
-				line = "{'status':'fail','exception':'NullPointerException','msg':'" + e.getMessage() + "'}";
-				e.printStackTrace();
-			} catch (Exception e){
-				line = "{'status':'fail','exception':'Exception','msg':'" + e.getMessage() + "'}";
+			} catch (Exception ex){
+				line = exceptionToJson(ex);
 			}
-
 		} finally { // close the connection
 			try {
 				hba.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// do nothing
 			}
 		}
-
 		return line;
 	}
 
 	/**
-	 * INSERT
-	 * /insert/alphabet/A/time:x:y:z
+	 * READ
+	 * @param table
+	 * @return
+	 */
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/fetch/{tablename:.+}")
+    public String hbaseRetrieveAll(@PathParam("tablename") String table) {
+        String line="{'status':'init'}";
+        Configuration config = getHBaseConfiguration();
+ 		try{
+             HTable ht = new HTable(config, table);
+             Scan s = new Scan();
+             ResultScanner ss = ht.getScanner(s);
+             for(Result r:ss){
+                 for(KeyValue kv : r.raw()){
+                	 line = line+ new String(kv.getRow()) + " ";
+                	 line = line + new String(kv.getFamily()) + ":";
+                	 line = line + new String(kv.getQualifier()) + " ";
+                	 line = line + kv.getTimestamp() + " ";
+                	 line = line + new String(kv.getValue());
+                	 line = line + "/n";
+                 }
+             }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+		return line;
+    }
+	
+	/**
+	 * UPDATE
+	 * /update/alphabet/A/time:x:y:z
 	 * @param tableName
 	 * @param columnFamilies
 	 * @return
@@ -146,6 +151,30 @@ public class HBaseService {
 		return line;
 	}
 
+	/**
+	 * DELETE
+	 * @param table
+	 * @return
+	 */
+	public String deleteTable(String table) {
+		String line = "{'status':'init}";
+		try {
+			Configuration config = getHBaseConfiguration();
+			HBaseAdmin admin = new HBaseAdmin(config);
+			admin.disableTable(table);
+			admin.deleteTable(table);
+			line = "{'status':'ok'}";
+		} catch (MasterNotRunningException ex) {
+			line = "{'status':'fail','exception':'MasterNotRunningException','msg':'" + ex.getMessage() + "'}";
+		} catch (ZooKeeperConnectionException ex) {
+			line = "{'status':'fail','exception':'ZooKeeperConnectionException','msg':'" + ex.getMessage() + "'}";
+		} catch (IOException ex) {
+			line = "{'status':'fail','exception':'IOException','msg':'" + ex.getMessage() + "'}";
+		} 
+		return line;
+	}
+
+	
 	@PUT
 	@Produces("application/json")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -155,39 +184,7 @@ public class HBaseService {
 		return line;
 	}
 	
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/hbaseRetrieveAll/{tablename:.+}")
-    public String hbaseRetrieveAll(@QueryParam("callback") String callback,@PathParam("tablename") String tablename) {
-        String line="";
-    	
-        Configuration config = getHBaseConfiguration();         
-      
- 		try{
-             HTable table = new HTable(config, tablename);
-             Scan s = new Scan();
-             ResultScanner ss = table.getScanner(s);
-             for(Result r:ss){
-                 for(KeyValue kv : r.raw()){
-                	 line = line+ new String(kv.getRow()) + " ";
-                	 line = line + new String(kv.getFamily()) + ":";
-                	 line = line + new String(kv.getQualifier()) + " ";
-                	 line = line + kv.getTimestamp() + " ";
-                	 line = line + new String(kv.getValue());
-                	 line = line + "/n";
-                   /* System.out.print(new String(kv.getRow()) + " ");
-                    System.out.print(new String(kv.getFamily()) + ":");
-                    System.out.print(new String(kv.getQualifier()) + " ");
-                    System.out.print(kv.getTimestamp() + " ");
-                    System.out.println(new String(kv.getValue()));*/
-                 }
-             }
-        } catch (IOException e){
-            e.printStackTrace();
-        }
- 		
-		return line;
-    }
+
 	
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -367,6 +364,8 @@ public class HBaseService {
 
 		return line;
 	}
+	
+	
 	private Configuration getHBaseConfiguration() {
 		Configuration config = HBaseConfiguration.create();
 		config.clear();
@@ -374,5 +373,34 @@ public class HBaseService {
 		config.set("hbase.zookeeper.property.clientPort", HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT);
 		config.set("hbase.master", HBASE_MASTER);
 		return config;
+	}
+	
+	/**
+	 * HANDLE ALL EXCEPTIONS
+	 * @param ex
+	 * @return
+	 */
+	private String exceptionToJson(Exception ex) {
+		String json = "{'status':'fail','exception':'";
+		String exception = "";
+		String message = "";	
+		if (ex instanceof MasterNotRunningException) {
+			exception = MasterNotRunningException.class.toString();
+			message = ex.getMessage();
+		} else if (ex instanceof ZooKeeperConnectionException) {
+			exception = ZooKeeperConnectionException.class.toString();
+			message = ex.getMessage();
+		} else if (ex instanceof IOException) {
+			exception = IOException.class.toString();
+			message = ex.getMessage();
+		} else if (ex instanceof NullPointerException) {
+			exception = NullPointerException.class.toString();
+			message = ex.getMessage();
+		} else {
+			exception = Exception.class.toString();
+			message = ex.getMessage();
+		}
+		json += exception + "','msg':'" + message + "'}";
+		return json;
 	}
 }

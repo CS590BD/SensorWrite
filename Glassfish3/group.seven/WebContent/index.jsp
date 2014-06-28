@@ -12,6 +12,6 @@
     <p>usage:
     <br>http://server:port/application/rest/hbase/create/tablename/column1:column2:column3:column4:column5</p>
     <p>example: create a table of cars with three columns: mazda, ford, honda
-    <br>http://134.193.136.147:8080/group.seven/rest/hbase/create/cars/mazda:ford:honda</p>
+    <br>http://localhost:8080/group.seven/rest/hbase/create/cars/mazda:ford:honda</p>
   </body>
 </html> 
