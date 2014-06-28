@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -46,10 +47,11 @@ public class HBaseService {
 	 * @param columnFamilies
 	 * @return
 	 */
-	@GET
+	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/create/{tablename:.+}/{columnFamilies:.+}")
-	public String createTable(@PathParam("tablename") String tablename,
+	public String createTable(
+			@PathParam("tablename") String tablename,
 			@PathParam("columnFamilies") String columnFamilies) {
 		String line = "{'status':'init'}";
 		HBaseAdmin hba = null;
@@ -86,7 +88,7 @@ public class HBaseService {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/fetch/{tablename:.+}")
-    public String hbaseRetrieveAll(@PathParam("tablename") String table) {
+    public String readAll(@PathParam("tablename") String table) {
         String line="{'status':'init'}";
         Configuration config = getHBaseConfiguration();
  		try{
@@ -116,10 +118,10 @@ public class HBaseService {
 	 * @param columnFamilies
 	 * @return
 	 */
-	@PUT
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/insert/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}/{value:.+}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String insert(
+	public String insertSingle(
 			String headerString,
 			@PathParam("table") String table,
 			@PathParam("row") String row,
@@ -133,30 +135,29 @@ public class HBaseService {
 		
 		try {
 			ht = new HTable(config, table);
-		} catch (IOException e) {
-			line = "{'status':'fail','exception':'IOException','msg':'" + e.getMessage() + "'}";
-			e.printStackTrace();
-		}
-		
-		Put put = new Put(Bytes.toBytes(row));
-		put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
-		
-		try {
+			Put put = new Put(Bytes.toBytes(row));
+			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 			ht.put(put);
 			line = "{'status':'ok'}";
-		} catch (IOException e) {
-			line = "{'status':'fail','exception':'IOException','msg':'" + e.getMessage() + "'}";
-		}
-		
+		} catch (Exception ex) {
+			line = exceptionToJson(ex);
+		}		
 		return line;
 	}
 
+	public String insertBatch() {
+		return "";
+	}
 	/**
 	 * DELETE
 	 * @param table
 	 * @return
 	 */
-	public String deleteTable(String table) {
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/delete/{table:.+}")
+	public String deleteTable(
+			@PathParam("table") String table) {
 		String line = "{'status':'init}";
 		try {
 			Configuration config = getHBaseConfiguration();
@@ -164,33 +165,9 @@ public class HBaseService {
 			admin.disableTable(table);
 			admin.deleteTable(table);
 			line = "{'status':'ok'}";
-		} catch (MasterNotRunningException ex) {
-			line = "{'status':'fail','exception':'MasterNotRunningException','msg':'" + ex.getMessage() + "'}";
-		} catch (ZooKeeperConnectionException ex) {
-			line = "{'status':'fail','exception':'ZooKeeperConnectionException','msg':'" + ex.getMessage() + "'}";
-		} catch (IOException ex) {
-			line = "{'status':'fail','exception':'IOException','msg':'" + ex.getMessage() + "'}";
-		} 
-		return line;
-	}
-
-	
-	@PUT
-	@Produces("application/json")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String putSensorsTxt() {
-		String line = "{'status':'init'}";
-		
-		return line;
-	}
-	
-
-	
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String doPost(String message) {
-		String line = "{'status':'fail','exception':'NotYetImplemented','msg':'POST method not yet implemented'}";
+		} catch (Exception ex) {
+			line = exceptionToJson(ex);
+		}
 		return line;
 	}
 	
