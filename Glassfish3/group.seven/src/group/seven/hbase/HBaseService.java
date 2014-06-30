@@ -31,6 +31,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+import com.sun.xml.rpc.processor.modeler.j2ee.xml.string;
 
 @Path("/hbase")
 public class HBaseService {
@@ -41,7 +42,7 @@ public class HBaseService {
 
 	/**
 	 * CREATE
-	 * http://server:port/application/rest/hbase/create/tablename/column1:column2:column3:column4:column5
+	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/create/tablename/column1:column2:column3:column4:column5
 	 * 
 	 * @param tablename
 	 * @param columnFamilies
@@ -113,26 +114,24 @@ public class HBaseService {
 	
 	/**
 	 * UPDATE
-	 * /update/alphabet/A/time:x:y:z
+	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/insert/tablename/row/family/qualifier
 	 * @param tableName
 	 * @param columnFamilies
 	 * @return
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/insert/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}/{value:.+}")
+	@Path("/insert/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
 	public String insertSingle(
-			String headerString,
+			String value,
 			@PathParam("table") String table,
 			@PathParam("row") String row,
 			@PathParam("family") String family,
-			@PathParam("qualifier") String qualifier,
-			@PathParam("value") String value) {
+			@PathParam("qualifier") String qualifier) {
 		
 		String line = "{'status':'init'}";
 		Configuration config = getHBaseConfiguration();
 		HTable ht = null;
-		
 		try {
 			ht = new HTable(config, table);
 			Put put = new Put(Bytes.toBytes(row));
@@ -141,13 +140,21 @@ public class HBaseService {
 			line = "{'status':'ok'}";
 		} catch (Exception ex) {
 			line = exceptionToJson(ex);
-		}		
+		}
 		return line;
 	}
 
-	public String insertBatch() {
+	/**
+	 * POST ACCELEROMETER DATA
+	 * @param message
+	 * @return
+	 */
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public String insertBatch(String message) {
 		return "";
 	}
+	
 	/**
 	 * DELETE
 	 * @param table
@@ -171,69 +178,6 @@ public class HBaseService {
 		return line;
 	}
 	
-	/*
-	@PUT
-	@Path("/insert/{tableName:.+}/{rowName:.+}/{columnFamilies:.+}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String insert(
-			String headerString,
-			@PathParam("tableName") String tableName,
-			@PathParam("rowName") String rowName,
-			@PathParam("columnFamilies") String columnFamilies) {
-		
-		String line = "{'status':'init'}";
-		Configuration config = getHBaseConfiguration();
-		HTable table = null;
-
-		try {
-			table = new HTable(config, tableName);
-		} catch (IOException e1) {
-			line = "{'status':'fail','exception':'IOException','msg':'" + e1.getMessage() + "'}";
-			e1.printStackTrace();
-		}
-
-		Put put = new Put(Bytes.toBytes(rowName));
-		
-		String[] values = headerString.split(":");
-		String[] columns = columnFamilies.split(":");
-
-		try {
-			int count = 0;
-		for (String s : values) {
-			put.add(Bytes.toBytes(columns[count]), Bytes.toBytes(s));
-			count++;
-		}
-		} catch (NullPointerException e) {
-			line = "{'status':'fail','exception':'NullPointerException','msg':'" + e.getMessage() + "'}";
-		}
-		
-		try {
-				Put p = new Put(Bytes.toBytes("A"), timeStamp);
-
-				p.add(Bytes.toBytes(cf1), Bytes.toBytes("col" + count),
-						Bytes.toBytes(latitude + "," + longitude));
-
-				p.add(Bytes.toBytes(cf2), Bytes.toBytes("col" + (count + 2)),
-						Bytes.toBytes(Date));
-
-				p.add(Bytes.toBytes(cf3), Bytes.toBytes("col" + (count + 3)),
-						Bytes.toBytes(x + "," + y + "," + z));
-
-				table.put(p);
-
-				count = count + 1;
-				timestamp = timestamp + 1;
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			line = e.toString();
-		} finally {
-		}
-
-		return line;
-	}
-	
-
 	
 	/**
 	 * INSERT FILE
@@ -342,7 +286,10 @@ public class HBaseService {
 		return line;
 	}
 	
-	
+	/**
+	 * RETURN THE HBASE CONFIGURATION
+	 * @return
+	 */
 	private Configuration getHBaseConfiguration() {
 		Configuration config = HBaseConfiguration.create();
 		config.clear();
