@@ -1,6 +1,7 @@
 package group.seven.hbase;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -173,6 +174,7 @@ public class HBaseService {
 	
 	/**
 	 * INSERT FILE
+	 * http://localhost:8080/group.seven/rest/hbase/insert-sensor-txt/ttjj_sensor_txt//path
 	 * @param tablename
 	 * @param filepath
 	 * @param columnFamilies
@@ -180,101 +182,18 @@ public class HBaseService {
 	 */
 	@GET
 	@Produces("application/json")
-	@Path("insert/{tablename:.+}/{filepath:.+}/{columnFamilies:.+}")
+	@Path("/insert-sensor-txt/{tablename:.+}/{filepath:.+}")
 	public String insertFile(
-			@PathParam("tablename") String tablename,
-			@PathParam("filepath") String filepath,
-			@PathParam("columnFamilies") String columnFamilies) {
+			@PathParam("tablename") String table,
+			@PathParam("filepath") String filePath) {
 		
-		String line = "insert success";
-
-		Configuration config = HBaseConfiguration.create();
-		config.clear();
-		config.set("hbase.zookeeper.quorum", HBASE_ZOOKEEPER_QUORUM_IP);
-		config.set("hbase.zookeeper.property.clientPort", HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT);
-		config.set("hbase.master", HBASE_MASTER);
-
-		String latitude = "", longitude = "", Date = "", x = "", y = "", z = "";
-
-		HTable table = null;
+		String line = "{'status':'init'}";
 		try {
-			table = new HTable(config, tablename);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			HBase.insertSensorsTxt(table, filePath);
+			line = "{'status':'ok'}";
+		} catch (Exception ex) {
+			line = exceptionToJson(ex);
 		}
-
-		int count = 1;
-		int timestamp = 10000;
-
-		BufferedReader br = null;
-
-		String finalpath = filepath.replace("-", "/");
-
-		try {
-
-			String sCurrentLine;
-
-			br = new BufferedReader(new FileReader(finalpath));
-
-			while ((sCurrentLine = br.readLine()) != null) {
-
-				Put p = new Put(Bytes.toBytes("row1"), timestamp);
-
-				if (sCurrentLine.equals("")) {
-					continue;
-				}
-
-				String[] array = sCurrentLine.split("\t");
-				latitude = array[0];
-				longitude = array[1];
-				Date = array[2];
-				x = array[3];
-				y = array[4];
-				z = array[5];
-
-				String cf1 = columnFamilies.split(":")[0];
-				String cf2 = columnFamilies.split(":")[1];
-				String cf3 = columnFamilies.split(":")[2];
-
-				p.add(Bytes.toBytes(cf1), Bytes.toBytes("col" + count),
-						Bytes.toBytes(latitude + "," + longitude));
-
-				// p.add(Bytes.toBytes("longitude"),
-				// Bytes.toBytes("col"+(count+1)),Bytes.toBytes(longitude));
-
-				p.add(Bytes.toBytes(cf2), Bytes.toBytes("col" + (count + 2)),
-						Bytes.toBytes(Date));
-
-				p.add(Bytes.toBytes(cf3), Bytes.toBytes("col" + (count + 3)),
-						Bytes.toBytes(x + "," + y + "," + z));
-
-				// p.add(Bytes.toBytes("y"),
-				// Bytes.toBytes("col"+(count+4)),Bytes.toBytes(y));
-
-				// p.add(Bytes.toBytes("z"),
-				// Bytes.toBytes("col"+(count+5)),Bytes.toBytes(z));
-
-				table.put(p);
-
-				count = count + 1;
-				timestamp = timestamp + 1;
-
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			line = e.toString();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				line = ex.toString();
-			}
-		}
-
 		return line;
 	}
 	
@@ -291,6 +210,7 @@ public class HBaseService {
 		return config;
 	}
 	
+	
 	/**
 	 * HANDLE ALL EXCEPTIONS
 	 * @param ex
@@ -305,6 +225,9 @@ public class HBaseService {
 			message = ex.getMessage();
 		} else if (ex instanceof ZooKeeperConnectionException) {
 			exception = ZooKeeperConnectionException.class.toString();
+			message = ex.getMessage();
+		} else if (ex instanceof FileNotFoundException) {
+			exception = FileNotFoundException.class.toString();
 			message = ex.getMessage();
 		} else if (ex instanceof IOException) {
 			exception = IOException.class.toString();
