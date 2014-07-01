@@ -36,12 +36,12 @@ import com.sun.xml.rpc.processor.modeler.j2ee.xml.string;
 @Path("/hbase")
 public class HBaseService {
 		
-	private final String HBASE_ZOOKEEPER_QUORUM_IP = "localhost.localdomain";
+	private final String HBASE_ZOOKEEPER_QUORUM_IP = "localhost.localdomain"; //Modify this in your hosts file. It will already work on the UMKC server
 	private final String HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181";
 	private final String HBASE_MASTER = HBASE_ZOOKEEPER_QUORUM_IP + ":60010";
 
 	/**
-	 * CREATE
+	 * CREATE TABLE
 	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/create/tablename/column1:column2:column3:column4:column5
 	 * 
 	 * @param tablename
@@ -82,15 +82,16 @@ public class HBaseService {
 	}
 
 	/**
-	 * READ
+	 * READ ALL FROM TABLE
+	 * http://localhost:8080/group.seven/rest/hbase/fetch/tablename
 	 * @param table
 	 * @return
 	 */
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/fetch/{tablename:.+}")
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/fetch/{tablename:.+}")
     public String readAll(@PathParam("tablename") String table) {
-        String line="{'status':'init'}";
+    	String line = "";
         Configuration config = getHBaseConfiguration();
  		try{
              HTable ht = new HTable(config, table);
@@ -103,7 +104,7 @@ public class HBaseService {
                 	 line = line + new String(kv.getQualifier()) + " ";
                 	 line = line + kv.getTimestamp() + " ";
                 	 line = line + new String(kv.getValue());
-                	 line = line + "/n";
+                	 line = line + "\n\n";
                  }
              }
         } catch (IOException e){
@@ -112,13 +113,16 @@ public class HBaseService {
 		return line;
     }
 	
-	/**
-	 * UPDATE
+    /**
+     * UPDATE AT QUALIFIER
 	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/insert/tablename/row/family/qualifier
-	 * @param tableName
-	 * @param columnFamilies
-	 * @return
-	 */
+     * @param value - passed in the header message
+     * @param table
+     * @param row
+     * @param family
+     * @param qualifier
+     * @return
+     */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/insert/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
@@ -143,20 +147,9 @@ public class HBaseService {
 		}
 		return line;
 	}
-
-	/**
-	 * POST ACCELEROMETER DATA
-	 * @param message
-	 * @return
-	 */
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	public String insertBatch(String message) {
-		return "";
-	}
 	
 	/**
-	 * DELETE
+	 * DELETE TABLE
 	 * @param table
 	 * @return
 	 */
@@ -177,7 +170,6 @@ public class HBaseService {
 		}
 		return line;
 	}
-	
 	
 	/**
 	 * INSERT FILE
