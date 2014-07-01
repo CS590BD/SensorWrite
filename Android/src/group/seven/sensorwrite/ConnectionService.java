@@ -171,9 +171,8 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
                //mHandler.sendMessage(Message.obtain(null, MSG_PROGRESS, "Discovering Services..."));
            } else if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_DISCONNECTED) {
         	   try {
-        		   String url = "http://" + GLASSFISH_IP + ":8080/group.seven/rest/hbase/insert/a0_accelerometer/letters/A/A1";
+        		   String url = "http://" + GLASSFISH_IP + ":8080/group.seven/rest/hbase/insert/a0_accelerometer/letters/D/D1";
         		   doPost(url, growingData);
-        		   Log.wtf("http post successful", growingData);
         	   } catch (Exception ex) {
         		   Log.wtf("data failed to send", ex.getMessage());
         	   }
@@ -298,7 +297,7 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
 	    }
 	    */
     }
-	public static String doPost(String url, String message) throws Exception {
+	public String doPost(String url, String message) throws Exception {
 		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost(url);
 		StringEntity input = new StringEntity(message);
@@ -308,6 +307,7 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
 		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));	
 		String line = "";
 		while ((line += reader.readLine()) != null) {}
+		System.out.println("http post successful, growingData = " + growingData);
 		return line;
 	}
 }
