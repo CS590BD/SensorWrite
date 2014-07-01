@@ -20,6 +20,7 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
 import android.os.Environment;
+import android.util.Log;
 import android.util.SparseArray;
 
 
@@ -49,6 +50,7 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
     //private ArrayList<String> sensorData;
     private int fileCounter;
     private SimpleKeysStatus state;
+	protected Object log;
    
 	
 	public ConnectionService()
@@ -235,7 +237,7 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
         		   SaveData(d.toString() + ": " + state.toString() + " " + String.valueOf(acceleration[0]) + ", " 
         				   + String.valueOf(acceleration[1]) + ", " + String.valueOf(acceleration[2]) + ";\n");
     		   //}
-    		   
+    		   Log.i("accelerometer",String.valueOf(acceleration[0]));
     	   }
     	   if (SIMPLE_KEYS_DATA.equals(characteristic.getUuid()))
     	   {
@@ -243,6 +245,7 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
     		   //SaveData("SIMPLE KEYS NOTIFICATION, state= " + state.toString() + "\n");
     		   Date d = new Date();
     		   SaveData(d.toString() + ": " + state.toString() + "\n");
+    		   Log.i("simple_click",state.toString());
 //    		   if (state.equals(SimpleKeysStatus.OFF_OFF))
 //    		   {
 //    			   ++fileCounter;

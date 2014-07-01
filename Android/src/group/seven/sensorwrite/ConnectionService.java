@@ -30,8 +30,7 @@ import android.util.SparseArray;
 
 public class ConnectionService extends IntentService implements BluetoothAdapter.LeScanCallback{
 
-	private static final String GLASSFISH_IP = "192.168.1.5";
-	private static final String TAG = "BluetoothGattActivity";
+	private static final String GLASSFISH_IP = "10.10.89.140";
     private static final String DEVICE_NAME = "SensorTag";
 
     /* Acceleromter configuration servcie */
@@ -171,8 +170,8 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
                //mHandler.sendMessage(Message.obtain(null, MSG_PROGRESS, "Discovering Services..."));
            } else if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_DISCONNECTED) {
         	   try {
-        		   String url = "http://" + GLASSFISH_IP + ":8080/group.seven/rest/hbase/insert/a0_accelerometer/letters/D/D1";
-        		   doPost(url, growingData);
+        		   String url = "http://" + GLASSFISH_IP + ":8080/group.seven/rest/hbase/insert/a0_accelerometer/letters/E/E1";
+        		   HTTP.post(url, growingData);
         	   } catch (Exception ex) {
         		   Log.wtf("data failed to send", ex.getMessage());
         	   }
@@ -262,7 +261,6 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
  
    private void updateAccelerometerCals(BluetoothGattCharacteristic characteristic) {
        Float[] values = SensorTagData.extractAccelerometerReading(characteristic, 0);
-
        Log.wtf("values", "x="+values[0].toString() + ", y=" + values[1].toString() + ", z=" + values[2].toString());
        Date d = new Date();
        String string = "\n"+d.toString() 
@@ -274,40 +272,6 @@ public class ConnectionService extends IntentService implements BluetoothAdapter
    
    private void SaveData(String string) {
 	   Log.wtf("invoke method", "SaveData");
-
 	   growingData += string;
-	   /*
-	   File sdCard = Environment.getExternalStorageDirectory();
-	    File directory = new File (sdCard.getAbsolutePath() + "/Data");
-	    if(!directory.exists())
-	    directory.mkdirs();
-	    String fname = "wtf.txt";
-	    File file = new File (directory, fname);
-	    
-	    try {
-	        if(!file.exists())
-	            file.createNewFile();
-	           FileOutputStream out = new FileOutputStream(file,true);
-	           out.write(string.getBytes());
-	           out.flush();
-	           out.close();
-	    } catch (Exception e) {
-			   e.printStackTrace();
-			   Log.wtf("SaveData failed", e.getMessage());
-	    }
-	    */
     }
-	public String doPost(String url, String message) throws Exception {
-		HttpClient client = new DefaultHttpClient();
-		HttpPost post = new HttpPost(url);
-		StringEntity input = new StringEntity(message);
-		//input.setContentType(contentType);
-		post.setEntity(input);
-		HttpResponse response = client.execute(post);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));	
-		String line = "";
-		while ((line += reader.readLine()) != null) {}
-		System.out.println("http post successful, growingData = " + growingData);
-		return line;
-	}
 }
