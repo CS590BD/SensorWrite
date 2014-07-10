@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- http://androidadvice.blogspot.com/2010/10/tablelayout-columns-equal-width.html -->
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="1" >
+
+    <!-- XYZ -->
+    <!-- X -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblAccelerationX"
+            android:text="Hold left simple key to record"
+            android:textAppearance="?android:attr/textAppearanceMedium" >
+        </TextView>
+    </TableRow>
+    <!-- Y -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblAccelerationY"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium" >
+        </TextView>
+    </TableRow>
+    <!-- Z -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblAccelerationZ"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium" >
+        </TextView>
+    </TableRow>
+    <TableRow>
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnSave" />
+
+        <Button
+            android:id="@+id/btnDiscard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnDiscard" />        
+    </TableRow>
+    
+    <!-- CHARACTER MAP -->
+    <!-- ROW 1 -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblA"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="A"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblB"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="B"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblC"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="C"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblD"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="D"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblE"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="E"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+	<!-- ROW 2 -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblF"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="F"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblG"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="G"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblH"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="H"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblI"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="I"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblJ"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="J"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+   	<!-- ROW 3 -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblK"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="K"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblL"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="L"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblM"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="M"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblN"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="N"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblO"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="O"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <!-- ROW 4 -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblP"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="P"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblQ"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="Q"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblR"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="R"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblS"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="S"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblT"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="T"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <!-- ROW 5 -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblU"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="U"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblV"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="V"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblW"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="W"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblX"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="X"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblY"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="Y"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <!-- ROW 6 -->
+    <TableRow>
+        <TextView
+            android:id="@+id/lblZ"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="Z"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblExclamationPoint"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="!"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblPeriod"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="."
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblComma"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text=","
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/lblQuestionMark"
+            android:gravity="center"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:layout_margin="4dip"
+            android:layout_weight="1"
+            android:text="\?"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+</TableLayout>

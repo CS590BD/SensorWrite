@@ -6,5 +6,8 @@
     <string name="lblX">X = </string>
     <string name="lblY">Y = </string>
     <string name="lblZ">Z = </string>
+    <string name="action_storage">Storage</string>
+    <string name="btnSave">Save</string>
+    <string name="btnDiscard">Discard</string>
 
 </resources>

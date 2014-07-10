@@ -1,6 +1,6 @@
 package group.seven.sensorwrite;
 
-import group.seven.sensorwrite.MainActivity.ConnectionServiceReceiver;
+import group.seven.sensorwrite.DataTrainingActivity.ConnectionServiceReceiver;
 import group.seven.sensorwrite.SensorTagData.SimpleKeysStatus;
 
 import java.util.UUID;
@@ -15,6 +15,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
+import android.util.Log;
 import android.util.SparseArray;
 
 public class ConnectionService extends IntentService implements
@@ -52,6 +53,7 @@ public class ConnectionService extends IntentService implements
 
 	@Override
 	public void onCreate() {
+		Log.wtf("system.out", "ConnectionService loaded");
 		super.onCreate();
 		BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
 		mBluetoothAdapter = manager.getAdapter();
@@ -111,13 +113,11 @@ public class ConnectionService extends IntentService implements
 
 			switch (mState) {
 			case 1:
-				// SaveData(Thread.currentThread().toString() +
-				// " subscribing to Accelerometer data notifications\n");
+				// subscribe to accelerometer data notifications
 				characteristic = gatt.getService(ACCELEROMETER_SERVICE).getCharacteristic(ACCELEROMETER_DATA);
 				break;
 			case 0:
-				// SaveData(Thread.currentThread().toString() +
-				// " subscribing to Simple Keys data notifications\n");
+				// subscribe to simple keys data notifications
 				characteristic = gatt.getService(SIMPLE_KEYS_SERVICE).getCharacteristic(SIMPLE_KEYS_DATA);
 				break;
 			default:
@@ -135,16 +135,10 @@ public class ConnectionService extends IntentService implements
 		@Override
 		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
 			if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
-				/*
-				 * Once successfully connected, we must next discover all the
-				 * services on the device before we can read and write their
-				 * characteristics.
-				 */
+				// discover all services on device before we can read and write their characteristics
 				gatt.discoverServices();
 			} else if (status != BluetoothGatt.GATT_SUCCESS) {
-				/*
-				 * If there is a failure at any stage, simply disconnect
-				 */
+				// if there is a failure at any stage, simply disconnect
 				gatt.disconnect();
 			}
 		}
@@ -183,6 +177,7 @@ public class ConnectionService extends IntentService implements
 				String z = Double.toString(acceleration[2]);
 				long timestamp = System.currentTimeMillis();
 				
+				//broadcast only during periods where left-click is held down
 				if(state.equals(SimpleKeysStatus.ON_OFF)) {
 					Intent broadcastIntent = new Intent();
 					broadcastIntent.setAction(ConnectionServiceReceiver.PROCESS_RESPONSE);
