@@ -19,6 +19,7 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.ZooKeeperConnectionException;
+import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
@@ -30,27 +31,13 @@ import org.apache.hadoop.hbase.util.Bytes;
 @Path("/hbase")
 public class HBaseService {
 
-	private final String HBASE_ZOOKEEPER_QUORUM_IP = "localhost.localdomain"; // Modify
-																				// this
-																				// in
-																				// your
-																				// hosts
-																				// file.
-																				// It
-																				// will
-																				// already
-																				// work
-																				// on
-																				// the
-																				// UMKC
-																				// server
+	private final String HBASE_ZOOKEEPER_QUORUM_IP = "localhost.localdomain";
 	private final String HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181";
 	private final String HBASE_MASTER = HBASE_ZOOKEEPER_QUORUM_IP + ":60010";
 
 	/**
 	 * CREATE TABLE
-	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/create
-	 * /tablename/column1:column2:column3:column4:column5
+	 * http://localhost:8080/goup.seven/rest/hbase/create/tablename/column1:column2:column3:column4:column5
 	 * 
 	 * @param tablename
 	 * @param columnFamilies
@@ -59,7 +46,8 @@ public class HBaseService {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/create/{tablename:.+}/{columnFamilies:.+}")
-	public String createTable(@PathParam("tablename") String tablename,
+	public String createTable(
+			@PathParam("tablename") String tablename,
 			@PathParam("columnFamilies") String columnFamilies) {
 		String line = "{'status':'init'}";
 		HBaseAdmin hba = null;
@@ -123,11 +111,9 @@ public class HBaseService {
 
 	/**
 	 * UPDATE AT QUALIFIER
-	 * http://localhost.localdomain:8080/goup.seven/rest/hbase
-	 * /insert/tablename/row/family/qualifier
+	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/insert/tablename/row/family/qualifier
 	 * 
-	 * @param value
-	 *            - passed in the header message
+	 * @param value - passed in the header message
 	 * @param table
 	 * @param row
 	 * @param family
@@ -137,8 +123,10 @@ public class HBaseService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/insert/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
-	public String insertSingle(String value, @PathParam("table") String table,
-			@PathParam("row") String row, @PathParam("family") String family,
+	public String insertSingle(String value, 
+			@PathParam("table") String table,
+			@PathParam("row") String row, 
+			@PathParam("family") String family,
 			@PathParam("qualifier") String qualifier) {
 
 		String line = "{'status':'init'}";
@@ -159,6 +147,7 @@ public class HBaseService {
 
 	/**
 	 * DELETE TABLE
+	 * http://localhost:8080/group.seven/rest/hbase/delete/tablename
 	 * 
 	 * @param table
 	 * @return

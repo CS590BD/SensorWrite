@@ -3,5 +3,8 @@
 
     <string name="app_name">SensorWrite</string>
     <string name="action_settings">Settings</string>
+    <string name="lblX">X = </string>
+    <string name="lblY">Y = </string>
+    <string name="lblZ">Z = </string>
 
 </resources>
