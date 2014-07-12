@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="IP">10.10.89.140</string>
+    <string name="Port">8080</string>
+    <string name="Application">group.seven</string>
+    <string name="MappingPattern">rest</string>
+    <string name="Storage">hbase</string>
+    <string name="Insert">insert</string>
+    
+</resources>

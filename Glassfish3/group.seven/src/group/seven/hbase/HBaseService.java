@@ -135,8 +135,7 @@ public class HBaseService {
 		try {
 			ht = new HTable(config, table);
 			Put put = new Put(Bytes.toBytes(row));
-			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier),
-					Bytes.toBytes(value));
+			put.add(Bytes.toBytes(family), Bytes.toBytes(qualifier), System.currentTimeMillis(), Bytes.toBytes(value));
 			ht.put(put);
 			line = "{'status':'ok'}";
 		} catch (Exception ex) {

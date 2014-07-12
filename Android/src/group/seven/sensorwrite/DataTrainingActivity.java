@@ -1,11 +1,14 @@
 package group.seven.sensorwrite;
 
+import java.io.IOException;
+import java.util.Random;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -15,40 +18,50 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DataTrainingActivity extends Activity {
-	
-	private static final String GLASSFISH_IP = "10.205.1.232";
-	
 	private ConnectionServiceReceiver receiver;
+	private StringBuilder receivedData;
+	
+	//set these in the btnSave.click event
+	private String url;
+	private String value;
+	
+	//buttons
+	Button btnSave, btnDiscard;
+	
+	//labels
 	TextView lblAccelerometerX, lblAccelerometerY, lblAccelerometerZ;
 	TextView lblA, lblB, lblC, lblD, lblE, lblF, lblG, lblH, lblI, lblJ, lblK, lblL, lblM, 
 		lblN, lblO, lblP, lblQ, lblR, lblS, lblT, lblU, lblV, lblW, lblX, lblY, lblZ,
 		lblExclamationPoint, lblPeriod, lblComma, lblQuestionMark;
-	Button btnSave, btnDiscard;
 	
-	// used to toggle the selected character view
+	//reference the current and previous characters
 	TextView selectedCharacter;
 	TextView previousCharacter;
 	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		Log.wtf("system.out", "DataTrainingActivity loaded");
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_datatraining);
-		
-		registerUI();
-
-		Intent intent = new Intent(DataTrainingActivity.this, ConnectionService.class);
-		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
-		filter.addCategory(Intent.CATEGORY_DEFAULT);
-		receiver = new ConnectionServiceReceiver();
-		registerReceiver(receiver, filter);
-		startService(intent);
+	//for testing with fake data (click 3 times to trigger)
+	int questionMarkClickCount = 0;
+	
+	private class AsyncHttpPost extends AsyncTask<String, Integer, Double>{
+		@Override
+		protected Double doInBackground(String... params) {
+			try {
+				HTTP.post(url, params[0]);
+				Toast.makeText(DataTrainingActivity.this, "it worked?", Toast.LENGTH_LONG).show();
+			} catch (IOException ex) {
+				lblAccelerometerX.setText("Exception: " + ex.getMessage());
+				lblAccelerometerY.setText("");
+				lblAccelerometerZ.setText("");
+			}
+			return null;
+		}
 	}
 	
 	/**
 	 * BROADCAST RECEIVER
+	 * sender: ConnectionService.class
 	 */
 	public class ConnectionServiceReceiver extends BroadcastReceiver {
 		public static final String PROCESS_RESPONSE = "group.seven.sensorwrite.intent.action.PROCESS_RESPONSE";
@@ -61,7 +74,27 @@ public class DataTrainingActivity extends Activity {
 			lblAccelerometerX.setText(X);
 			lblAccelerometerY.setText(Y);
 			lblAccelerometerZ.setText(Z);
+			receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
 		}
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		Log.wtf("system.out", "DataTrainingActivity loaded");
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_datatraining);
+		
+		registerUI();
+		lblA.performClick();
+
+		/*
+		Intent intent = new Intent(DataTrainingActivity.this, ConnectionService.class);
+		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
+		filter.addCategory(Intent.CATEGORY_DEFAULT);
+		receiver = new ConnectionServiceReceiver();
+		registerReceiver(receiver, filter);
+		startService(intent);
+		*/
 	}
 	
 	@Override
@@ -85,29 +118,31 @@ public class DataTrainingActivity extends Activity {
 		}
 	}
 	
+	/**
+	 * REGISTER UI
+	 * 
+	 * Creates UI objects and register their listeners.
+	 */
 	private void registerUI() {
 		//buttons
 		btnSave = (Button)findViewById(R.id.btnSave);
 		btnDiscard = (Button)findViewById(R.id.btnDiscard);
-		
-		//button handlers
 		btnSave.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.wtf("system.out", "save clicked - implement your own data post!");
-				/*
-				String tableName = "characters";
-				String row = selectedCharacter.getText().toString();
-				familY?
-				qualifier?
-				String url = "http://" + GLASSFISH_IP + ":8080/group.seven/rest/hbase/insert/tablename/row/family/qualifier";
-				try {
-					//HTTP.post(url, message)
-					lblAccelerometerX.setText("data saved");
-				} catch (Exception ex) {
-					lblAccelerometerX.setText("Exception: " + ex.getMessage());
+				//if data is captured, try to store it
+				if(receivedData.toString().length() > 0) {
+					String character = selectedCharacter.getText().toString();
+					RestfulGestureData record = new RestfulGestureData(DataTrainingActivity.this, character); //sets family internally
+					record.value = receivedData.toString();
+					record.tableName = "characters";
+					record.row = "james";
+					record.qualifier = character;
+					url = record.toRestfulUrl();
+					value = record.value;
+					new AsyncHttpPost().execute(value);
+					Log.wtf("url", url);
 				}
-				*/
 			}
 		});
 		btnDiscard.setOnClickListener(new OnClickListener() {
@@ -116,6 +151,7 @@ public class DataTrainingActivity extends Activity {
 				lblAccelerometerX.setText("Hold left simple key to record");
 				lblAccelerometerY.setText("");
 				lblAccelerometerZ.setText("");
+				receivedData = new StringBuilder();
 			}
 		});
 		
@@ -182,18 +218,63 @@ public class DataTrainingActivity extends Activity {
 		lblExclamationPoint.setOnClickListener(lblClickListener);
 		lblPeriod.setOnClickListener(lblClickListener);
 		lblComma.setOnClickListener(lblClickListener);
-		lblQuestionMark.setOnClickListener(lblClickListener);
-
+		lblQuestionMark.setOnClickListener(questionMarkClickListener);
 	}
+	
 	OnClickListener lblClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			if(previousCharacter != null) {
-				previousCharacter.setBackgroundColor(Color.TRANSPARENT);
-			}
-			selectedCharacter = (TextView)v;
-			selectedCharacter.setBackgroundColor(Color.GRAY);
-			previousCharacter = selectedCharacter;
+			goToAndSelect(v);
+			questionMarkClickCount = 0;
 		}
 	};
+	OnClickListener questionMarkClickListener = new OnClickListener() {
+		// Three clicks on the ? character calls fake testing data
+		@Override
+		public void onClick(View v) {
+			if(questionMarkClickCount < 3) {
+				questionMarkClickCount++;
+				if(!selectedCharacter.getText().toString().equals("?")) {
+					goToAndSelect(v);
+				}
+			} else {
+				makeFakeData();
+			}
+		}
+	};
+	/**
+	 * Set current character, set previous character, set background colors
+	 * @param v
+	 */
+	private void goToAndSelect(View v) {
+		if(previousCharacter != null) {
+			previousCharacter.setBackgroundColor(Color.TRANSPARENT);
+		}
+		selectedCharacter = (TextView)v;
+		selectedCharacter.setBackgroundColor(Color.GRAY);
+		previousCharacter = selectedCharacter;
+	}
+	/**
+	 * Generates fake testing data. Click ? character three times to trigger.
+	 * @return
+	 */
+	private void makeFakeData() {
+		receivedData = new StringBuilder();
+		String x = "";
+		String y = "";
+		String z = "";
+		for(int i = 0; i < 40; i++) {
+			x = Float.toString(new Random().nextFloat());
+			y = Float.toString(new Random().nextFloat());
+			z = Float.toString(new Random().nextFloat());
+			receivedData.append(System.currentTimeMillis());
+			receivedData.append("\t" + x);
+			receivedData.append("\t" + y);
+			receivedData.append("\t" + z);
+			receivedData.append("\n");
+		}
+		lblAccelerometerX.setText(x);
+		lblAccelerometerY.setText(y);
+		lblAccelerometerZ.setText(z);
+	}
 }
