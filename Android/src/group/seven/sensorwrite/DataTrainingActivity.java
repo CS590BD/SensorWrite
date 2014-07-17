@@ -24,10 +24,6 @@ public class DataTrainingActivity extends Activity {
 	private ConnectionServiceReceiver receiver;
 	private StringBuilder receivedData;
 	
-	//set these in the btnSave.click event
-	private String url;
-	private String value;
-	
 	//buttons
 	Button btnSave, btnDiscard;
 	
@@ -43,21 +39,6 @@ public class DataTrainingActivity extends Activity {
 	
 	//for testing with fake data (click 3 times to trigger)
 	int questionMarkClickCount = 0;
-	
-	private class AsyncHttpPost extends AsyncTask<String, Integer, Double>{
-		@Override
-		protected Double doInBackground(String... params) {
-			try {
-				HTTP.post(url, params[0]);
-				Toast.makeText(DataTrainingActivity.this, "it worked?", Toast.LENGTH_LONG).show();
-			} catch (IOException ex) {
-				lblAccelerometerX.setText("Exception: " + ex.getMessage());
-				lblAccelerometerY.setText("");
-				lblAccelerometerZ.setText("");
-			}
-			return null;
-		}
-	}
 	
 	/**
 	 * BROADCAST RECEIVER
@@ -84,8 +65,9 @@ public class DataTrainingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_datatraining);
 		
+		receivedData = new StringBuilder();
 		registerUI();
-		lblA.performClick();
+		disableButtons();
 
 		/*
 		Intent intent = new Intent(DataTrainingActivity.this, ConnectionService.class);
@@ -136,11 +118,11 @@ public class DataTrainingActivity extends Activity {
 					RestfulGestureData record = new RestfulGestureData(DataTrainingActivity.this, character); //sets family internally
 					record.value = receivedData.toString();
 					record.tableName = "characters";
-					record.row = "james";
+					record.row = DataTrainingActivity.this.getResources().getString(R.string.user);
 					record.qualifier = character;
-					url = record.toRestfulUrl();
-					value = record.value;
-					new AsyncHttpPost().execute(value);
+					String url = record.toRestfulUrl();
+					String value = record.value;
+					new HttpAsyncTask(DataTrainingActivity.this, url).execute(value);
 					Log.wtf("url", url);
 				}
 			}
@@ -148,10 +130,7 @@ public class DataTrainingActivity extends Activity {
 		btnDiscard.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				lblAccelerometerX.setText("Hold left simple key to record");
-				lblAccelerometerY.setText("");
-				lblAccelerometerZ.setText("");
-				receivedData = new StringBuilder();
+				resetState();
 			}
 		});
 		
@@ -232,6 +211,7 @@ public class DataTrainingActivity extends Activity {
 		// Three clicks on the ? character calls fake testing data
 		@Override
 		public void onClick(View v) {
+			goToAndSelect(v);
 			if(questionMarkClickCount < 3) {
 				questionMarkClickCount++;
 				if(!selectedCharacter.getText().toString().equals("?")) {
@@ -247,6 +227,7 @@ public class DataTrainingActivity extends Activity {
 	 * @param v
 	 */
 	private void goToAndSelect(View v) {
+		enableButtons();
 		if(previousCharacter != null) {
 			previousCharacter.setBackgroundColor(Color.TRANSPARENT);
 		}
@@ -276,5 +257,27 @@ public class DataTrainingActivity extends Activity {
 		lblAccelerometerX.setText(x);
 		lblAccelerometerY.setText(y);
 		lblAccelerometerZ.setText(z);
+		enableButtons();
+	}
+	public void disableButtons() {
+		receivedData = new StringBuilder();
+		btnSave.setEnabled(false);
+		btnDiscard.setEnabled(false);
+	}
+	public void enableButtons() {
+		if(receivedData.toString().length() > 0) {
+			btnSave.setEnabled(true);
+			btnDiscard.setEnabled(true);
+		}
+	}
+	private void resetState() {
+		disableButtons();
+		showMessage("Hold left simple key to record");
+		receivedData = new StringBuilder();
+	}
+	private void showMessage(String message) {
+		lblAccelerometerX.setText(message);
+		lblAccelerometerY.setText("");
+		lblAccelerometerZ.setText("");
 	}
 }

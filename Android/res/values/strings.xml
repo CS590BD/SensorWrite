@@ -9,5 +9,6 @@
     <string name="action_storage">Storage</string>
     <string name="btnSave">Save</string>
     <string name="btnDiscard">Discard</string>
+    <string name="user">james</string>
 
 </resources>
