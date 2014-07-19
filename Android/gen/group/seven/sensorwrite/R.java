@@ -27,9 +27,8 @@ public final class R {
         public static final int ic_launcher=0x7f020002;
     }
     public static final class id {
-        public static final int action_edit=0x7f080025;
-        public static final int action_settings=0x7f080024;
-        public static final int action_storage=0x7f080026;
+        public static final int action_settings=0x7f080023;
+        public static final int action_storage=0x7f080024;
         public static final int btnDiscard=0x7f080004;
         public static final int btnSave=0x7f080003;
         public static final int lblA=0x7f080005;
@@ -65,7 +64,6 @@ public final class R {
         public static final int lblX=0x7f08001c;
         public static final int lblY=0x7f08001d;
         public static final int lblZ=0x7f08001e;
-        public static final int textView1=0x7f080023;
     }
     public static final class layout {
         public static final int activity_datatraining=0x7f030000;
@@ -82,7 +80,6 @@ public final class R {
         public static final int MappingPattern=0x7f050003;
         public static final int Port=0x7f050001;
         public static final int Storage=0x7f050004;
-        public static final int action_edit=0x7f05000f;
         public static final int action_settings=0x7f050007;
         public static final int action_storage=0x7f05000b;
         public static final int app_name=0x7f050006;
