@@ -31,6 +31,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 @Path("/hbase")
 public class HBaseService {
 
+	public final int MAX_VERSIONS = 10; //max versions of an hbase record to return 
+
 	private final String HBASE_ZOOKEEPER_QUORUM_IP = "localhost.localdomain";
 	private final String HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181";
 	private final String HBASE_MASTER = HBASE_ZOOKEEPER_QUORUM_IP + ":60010";
@@ -72,6 +74,39 @@ public class HBaseService {
 			} catch (IOException e) {
 				// do nothing
 			}
+		}
+		return line;
+	}
+	
+	/**
+	 * GET RECORD AND ALL ITS VERSIONS
+	 * http://localhost:8080/group.seven/rest/hbase/get/characters/james/capital/A
+	 * 
+	 * @param table
+	 * @param row
+	 * @param family
+	 * @param qualifier
+	 * @return all versions of record, up to quantity MAX_VERSIONS
+	 */
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/get/{tablename:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
+	public String getRecordAndVersions(
+			@PathParam("tablename") String table,
+			@PathParam("row") String row,
+			@PathParam("family") String family,
+			@PathParam("qualifier") String qualifier) {
+		String line = "{'status':'init'}";
+		Configuration config = getHBaseConfiguration();
+		try {
+			HTable ht = new HTable(config, table);
+			Get get = new Get(Bytes.toBytes(row));
+			get.setMaxVersions(MAX_VERSIONS);
+			Result result = ht.get(get);
+			byte[] value = result.getValue(Bytes.toBytes(family), Bytes.toBytes(qualifier));  // returns MAX_VERSIONS quantity of values
+			line = Bytes.toString(value);
+		} catch (IOException ex) {
+			line = exceptionToJson(ex);
 		}
 		return line;
 	}
