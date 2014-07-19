@@ -1,14 +1,13 @@
 package group.seven.sensorwrite;
 
-import java.io.IOException;
 import java.util.Random;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class DataTrainingActivity extends Activity {
 	private ConnectionServiceReceiver receiver;
@@ -91,13 +89,23 @@ public class DataTrainingActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		//handle presses on action bar items
 		switch(item.getItemId()) {
+			case R.id.action_edit:
+				openWrite();
+				return true;
 			case R.id.action_storage:
+				//do nothing - already here
 				return true;
 			case R.id.action_settings:
+				//not implemented
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	private void openWrite() {
+		Intent intent = new Intent(DataTrainingActivity.this, MainActivity.class);
+	    startActivity(intent);
 	}
 	
 	/**

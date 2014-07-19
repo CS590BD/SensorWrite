@@ -10,5 +10,6 @@
     <string name="btnSave">Save</string>
     <string name="btnDiscard">Discard</string>
     <string name="user">james</string>
+    <string name="action_edit">Write</string>
 
 </resources>

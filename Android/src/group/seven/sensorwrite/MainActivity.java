@@ -29,6 +29,9 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		//handle presses on action bar items
 		switch(item.getItemId()) {
+			case R.id.action_edit:
+				//do nothing - already here
+				return true;
 			case R.id.action_storage:
 				openStorage();
 				return true;
