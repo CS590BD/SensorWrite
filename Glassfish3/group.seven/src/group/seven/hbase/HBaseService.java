@@ -28,6 +28,8 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.util.List;
+
 @Path("/hbase")
 public class HBaseService {
 
@@ -39,7 +41,8 @@ public class HBaseService {
 
 	/**
 	 * CREATE TABLE
-	 * http://localhost:8080/goup.seven/rest/hbase/create/tablename/column1:column2:column3:column4:column5
+	 * http://localhost:8080/group.seven/rest/hbase/create-table/characters/capital:lowercase:numeric:punctuation
+	 * http://localhost:8080/group.seven/rest/hbase/create-table/foodgroups/fruit:vegetable:grain:meat:dairy
 	 * 
 	 * @param tablename
 	 * @param columnFamilies
@@ -47,7 +50,7 @@ public class HBaseService {
 	 */
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/create/{tablename:.+}/{columnFamilies:.+}")
+	@Path("/create-table/{tablename:.+}/{columnFamilies:.+}")
 	public String createTable(
 			@PathParam("tablename") String tablename,
 			@PathParam("columnFamilies") String columnFamilies) {
@@ -59,7 +62,9 @@ public class HBaseService {
 			HTableDescriptor ht = new HTableDescriptor(tablename);
 			// add columns
 			for (String columnFamily : columnFamilies.split(":")) {
-				ht.addFamily(new HColumnDescriptor(columnFamily));
+				HColumnDescriptor cd = new HColumnDescriptor(columnFamily);
+				cd.setMaxVersions(MAX_VERSIONS);
+				ht.addFamily(cd);
 			}
 			try { // save the table
 				hba = new HBaseAdmin(config);
@@ -79,8 +84,8 @@ public class HBaseService {
 	}
 	
 	/**
-	 * GET RECORD AND ALL ITS VERSIONS
-	 * http://localhost:8080/group.seven/rest/hbase/get/characters/james/capital/A
+	 * GET CELL AND ALL ITS VERSIONS
+	 * http://localhost:8080/group.seven/rest/hbase/get-versions/characters/james/capital/A
 	 * 
 	 * @param table
 	 * @param row
@@ -90,7 +95,7 @@ public class HBaseService {
 	 */
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/get/{tablename:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
+	@Path("/get-versions/{tablename:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
 	public String getRecordAndVersions(
 			@PathParam("tablename") String table,
 			@PathParam("row") String row,
@@ -103,8 +108,11 @@ public class HBaseService {
 			Get get = new Get(Bytes.toBytes(row));
 			get.setMaxVersions(MAX_VERSIONS);
 			Result result = ht.get(get);
-			byte[] value = result.getValue(Bytes.toBytes(family), Bytes.toBytes(qualifier));  // returns MAX_VERSIONS quantity of values
-			line = Bytes.toString(value);
+			List<KeyValue> kvpairs = result.getColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+			line = "";
+			for(KeyValue kv : kvpairs) {
+				line += Bytes.toString(kv.getValue()) + "\n";
+			}
 		} catch (IOException ex) {
 			line = exceptionToJson(ex);
 		}
@@ -146,8 +154,8 @@ public class HBaseService {
 
 	/**
 	 * UPDATE AT QUALIFIER
-	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/insert/tablename/row/family/qualifier
-	 * 
+	 * http://localhost:8080/group.seven/rest/hbase/post/tablename/row/family/qualifier
+	 * http://localhost:8080/group.seven/rest/hbase/post/foodgroups/dole/fruit/apple
 	 * @param value - passed in the header message
 	 * @param table
 	 * @param row
@@ -157,7 +165,7 @@ public class HBaseService {
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/insert/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
+	@Path("/post/{table:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
 	public String insertSingle(String value, 
 			@PathParam("table") String table,
 			@PathParam("row") String row, 
@@ -181,14 +189,14 @@ public class HBaseService {
 
 	/**
 	 * DELETE TABLE
-	 * http://localhost:8080/group.seven/rest/hbase/delete/tablename
+	 * http://localhost:8080/group.seven/rest/hbase/delete-table/tablename
 	 * 
 	 * @param table
 	 * @return
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/delete/{table:.+}")
+	@Path("/delete-table/{table:.+}")
 	public String deleteTable(@PathParam("table") String table) {
 		String line = "{'status':'init}";
 		try {
@@ -277,3 +285,9 @@ public class HBaseService {
 		return json;
 	}
 }
+
+/*
+ * 
+ * 
+ * 
+ */ 

@@ -27,7 +27,7 @@ public class RestfulGestureData {
 		this.application = context.getResources().getString(R.string.Application);
 		this.mappingPattern = context.getResources().getString(R.string.MappingPattern);
 		this.storage = context.getResources().getString(R.string.Storage);
-		this.method = context.getResources().getString(R.string.Insert);
+		this.method = context.getResources().getString(R.string.Post);
 	}
 	
 	private void setFamily(String character) {
@@ -44,7 +44,7 @@ public class RestfulGestureData {
 	}
 	/**
 	 * Based on this restful web service:
-	 * http://localhost.localdomain:8080/goup.seven/rest/hbase/insert/tablename/row/family/qualifier
+	 * http://localhost.localdomain:8080/group.seven/rest/hbase/post/tablename/row/family/qualifier
 	 * @return
 	 */
 	public String toRestfulUrl() {
