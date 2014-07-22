@@ -9,7 +9,7 @@ public class RestfulGestureData {
 	private String application;
 	private String mappingPattern;
 	private String storage;
-	private String method;
+	public String method;
 	public String tableName;
 	public String family;
 	public String row;
@@ -27,7 +27,6 @@ public class RestfulGestureData {
 		this.application = context.getResources().getString(R.string.Application);
 		this.mappingPattern = context.getResources().getString(R.string.MappingPattern);
 		this.storage = context.getResources().getString(R.string.Storage);
-		this.method = context.getResources().getString(R.string.Post);
 	}
 	
 	private void setFamily(String character) {

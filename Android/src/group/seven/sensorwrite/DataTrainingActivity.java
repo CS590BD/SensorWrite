@@ -128,9 +128,10 @@ public class DataTrainingActivity extends Activity {
 					record.tableName = "characters";
 					record.row = DataTrainingActivity.this.getResources().getString(R.string.user);
 					record.qualifier = character;
+					record.method = "post";
 					String url = record.toRestfulUrl();
 					String value = record.value;
-					new HttpAsyncTask(DataTrainingActivity.this, url).execute(value);
+					new HttpAsyncTask(DataTrainingActivity.this, url).execute("post", value);
 					Log.wtf("url", url);
 				}
 			}
@@ -252,11 +253,13 @@ public class DataTrainingActivity extends Activity {
 		String x = "";
 		String y = "";
 		String z = "";
+		long timestamp = System.currentTimeMillis();
 		for(int i = 0; i < 40; i++) {
 			x = Float.toString(new Random().nextFloat());
 			y = Float.toString(new Random().nextFloat());
 			z = Float.toString(new Random().nextFloat());
-			receivedData.append(System.currentTimeMillis());
+			timestamp += 20; //store 20 ms difference each time (makes better graphs)
+			receivedData.append(timestamp);
 			receivedData.append("\t" + x);
 			receivedData.append("\t" + y);
 			receivedData.append("\t" + z);

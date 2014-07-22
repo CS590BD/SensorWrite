@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -70,6 +71,34 @@ public class GraphingActivity extends Activity {
 	}
 
 	private void addData() {
+		
+		/*
+		String character = "S";
+		RestfulGestureData record = new RestfulGestureData(GraphingActivity.this, character); //sets family internally
+		record.tableName = "characters";
+		record.row = GraphingActivity.this.getResources().getString(R.string.user);
+		record.qualifier = character;
+		record.method = "get";
+		String url = record.toRestfulUrl();
+		HttpAsyncTask task = new HttpAsyncTask(GraphingActivity.this, url);
+		task.execute(record.method);
+		Log.wtf("url", url);
+		String data = task.getData();
+		
+		String[] lines = data.split("\n");
+		for(String line : lines) {
+			String[] values = line.split("\t");
+			Double timestamp = Double.parseDouble(values[0]);
+			Double x = Double.parseDouble(values[1]);
+			Double y = Double.parseDouble(values[2]);
+			Double z = Double.parseDouble(values[3]);
+			seriesX.add(timestamp, x);
+			seriesY.add(timestamp, y);
+			seriesZ.add(timestamp, z);
+		}
+		*/
+		
+
 		seriesX.add(1405983851728d, 0.4192289);
 		seriesX.add(1405983851729d, 0.7016753);
 		seriesX.add(1405983851730d, 0.50137144);

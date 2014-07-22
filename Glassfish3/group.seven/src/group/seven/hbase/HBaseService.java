@@ -84,6 +84,38 @@ public class HBaseService {
 	}
 	
 	/**
+	 * GET CELL LATEST VERSION ONLY
+	 * http://localhost:8080/group.seven/rest/hbase/get/characters/james/capital/A
+	 * 
+	 * @param table
+	 * @param row
+	 * @param family
+	 * @param qualifier
+	 * @return
+	 */
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/get/{tablename:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
+	public String getCell(
+			@PathParam("tablename") String table,
+			@PathParam("row") String row,
+			@PathParam("family") String family,
+			@PathParam("qualifier") String qualifier) {
+		String line = "{'status':'init'}";
+		Configuration config = getHBaseConfiguration();
+		try {
+			HTable ht = new HTable(config, table);
+			Get get = new Get(Bytes.toBytes(row));
+			Result result = ht.get(get);
+			byte[] value = result.getValue(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+			line = Bytes.toString(value);
+		} catch (IOException ex) {
+			line = exceptionToJson(ex);
+		}
+		return line;
+	}
+	
+	/**
 	 * GET CELL AND ALL ITS VERSIONS
 	 * http://localhost:8080/group.seven/rest/hbase/get-versions/characters/james/capital/A
 	 * 
@@ -96,7 +128,7 @@ public class HBaseService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/get-versions/{tablename:.+}/{row:.+}/{family:.+}/{qualifier:.+}")
-	public String getRecordAndVersions(
+	public String getCellAndVersions(
 			@PathParam("tablename") String table,
 			@PathParam("row") String row,
 			@PathParam("family") String family,
