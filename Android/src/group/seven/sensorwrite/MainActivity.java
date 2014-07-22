@@ -29,6 +29,9 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		//handle presses on action bar items
 		switch(item.getItemId()) {
+			case R.id.action_graph:
+				openGraphs();
+				return true;
 			case R.id.action_edit:
 				//do nothing - already here
 				return true;
@@ -40,6 +43,10 @@ public class MainActivity extends Activity {
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+	private void openGraphs() {
+		Intent intent = new Intent(MainActivity.this, GraphingActivity.class);
+	    startActivity(intent);
 	}
 	private void openStorage() {
 		Intent intent = new Intent(MainActivity.this, DataTrainingActivity.class);

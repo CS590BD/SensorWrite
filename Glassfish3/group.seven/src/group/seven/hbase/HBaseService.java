@@ -213,8 +213,7 @@ public class HBaseService {
 
 	/**
 	 * INSERT FILE
-	 * http://localhost:8080/group.seven/rest/hbase/insert-sensor-txt
-	 * /ttjj_sensor_txt//path
+	 * http://localhost:8080/group.seven/rest/hbase/insert-sensor-txt/ttjj_sensor_txt//path
 	 * 
 	 * @param tablename
 	 * @param filepath

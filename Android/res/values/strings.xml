@@ -11,5 +11,6 @@
     <string name="btnDiscard">Discard</string>
     <string name="user">james</string>
     <string name="action_edit">Write</string>
+    <string name="action_picture">Graphs</string>
 
 </resources>

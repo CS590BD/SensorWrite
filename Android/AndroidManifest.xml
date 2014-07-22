@@ -34,6 +34,10 @@
             android:name="group.seven.sensorwrite.DataTrainingActivity"
             android:label="@string/app_name">
         </activity>
+        <activity
+            android:name="group.seven.sensorwrite.GraphingActivity"
+            android:label="@string/app_name">
+        </activity>
         <service android:name="group.seven.sensorwrite.ConnectionService"></service>
     </application>
 </manifest>

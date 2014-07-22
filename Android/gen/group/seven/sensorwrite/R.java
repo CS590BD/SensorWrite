@@ -23,15 +23,18 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_action_edit=0x7f020000;
-        public static final int ic_action_storage=0x7f020001;
-        public static final int ic_launcher=0x7f020002;
+        public static final int ic_action_picture=0x7f020001;
+        public static final int ic_action_storage=0x7f020002;
+        public static final int ic_launcher=0x7f020003;
     }
     public static final class id {
-        public static final int action_edit=0x7f080025;
-        public static final int action_settings=0x7f080024;
-        public static final int action_storage=0x7f080026;
+        public static final int action_edit=0x7f080027;
+        public static final int action_graph=0x7f080026;
+        public static final int action_settings=0x7f080025;
+        public static final int action_storage=0x7f080028;
         public static final int btnDiscard=0x7f080004;
         public static final int btnSave=0x7f080003;
+        public static final int chart=0x7f080023;
         public static final int lblA=0x7f080005;
         public static final int lblAccelerationX=0x7f080000;
         public static final int lblAccelerationY=0x7f080001;
@@ -65,11 +68,12 @@ public final class R {
         public static final int lblX=0x7f08001c;
         public static final int lblY=0x7f08001d;
         public static final int lblZ=0x7f08001e;
-        public static final int textView1=0x7f080023;
+        public static final int textView1=0x7f080024;
     }
     public static final class layout {
         public static final int activity_datatraining=0x7f030000;
-        public static final int activity_main=0x7f030001;
+        public static final int activity_graphing=0x7f030001;
+        public static final int activity_main=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f070000;
@@ -84,6 +88,7 @@ public final class R {
         public static final int Post=0x7f050006;
         public static final int Storage=0x7f050004;
         public static final int action_edit=0x7f050010;
+        public static final int action_picture=0x7f050011;
         public static final int action_settings=0x7f050008;
         public static final int action_storage=0x7f05000c;
         public static final int app_name=0x7f050007;
