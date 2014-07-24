@@ -1,5 +1,8 @@
 package group.seven.sensorwrite;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 import android.app.Activity;
@@ -67,14 +70,14 @@ public class DataTrainingActivity extends Activity {
 		registerUI();
 		disableButtons();
 
-		/*
+		
 		Intent intent = new Intent(DataTrainingActivity.this, ConnectionService.class);
 		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
 		filter.addCategory(Intent.CATEGORY_DEFAULT);
 		receiver = new ConnectionServiceReceiver();
 		registerReceiver(receiver, filter);
 		startService(intent);
-		*/
+		
 	}
 	
 	@Override
@@ -113,6 +116,33 @@ public class DataTrainingActivity extends Activity {
 		Intent intent = new Intent(DataTrainingActivity.this, MainActivity.class);
 	    startActivity(intent);
 	}
+	//assumption, don't pass value with empty length else crash
+	private void writeSequence(File file, String value) {
+		try {
+			String contents = "";
+			FileWriter filewriter = new FileWriter(file, true);
+		    String[] lines = value.split("\n");
+		    
+		    //first doesn't start with ;
+			String[] values = lines[0].split("\t");
+			String x = values[1];
+			String y = values[2];
+			String z = values[3];
+		    contents += "[ " + x + "\t" + y + "\t" + z + " ]";
+		    //separate the rest by ;
+		    for(int i = 1; i < lines.length; i++) {
+				values = lines[i].split("\t");
+				x = values[1];
+				y = values[2];
+				z = values[3];
+				contents += " ; [ " + x + "\t" + y + "\t" + z + " ]";
+		    }
+		    filewriter.write(contents);
+		    filewriter.close();
+		} catch (IOException exception) {
+			
+		}
+	}
 	
 	/**
 	 * REGISTER UI
@@ -148,6 +178,7 @@ public class DataTrainingActivity extends Activity {
 					}
 					String url = new RestfulGestureData(context, method, table, row, family, qualifier, value).toRestfulUrl();
 					new HttpAsyncTask(context, url).execute(method, value);
+					writeSequence(new File(qualifier + ".seq"), value);
 					Log.wtf("url", url);
 				}
 			}
