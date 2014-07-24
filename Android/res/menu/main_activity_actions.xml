@@ -1,11 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_graph"
-        android:icon="@drawable/ic_action_picture"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_picture"/>
-    <item
         android:id="@+id/action_edit"
         android:icon="@drawable/ic_action_edit"
         android:showAsAction="ifRoom"
@@ -15,6 +10,12 @@
         android:icon="@drawable/ic_action_storage"
         android:showAsAction="ifRoom"
         android:title="@string/action_storage"/>
+    <item
+        android:id="@+id/action_graph"
+        android:icon="@drawable/ic_action_picture"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_picture"/>
+    
     <!-- Settings, should always be in the overflow -->
     <item
         android:id="@+id/action_settings"

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:drawSelectorOnTop="false"
+        android:descendantFocusability="blocksDescendants"
+    />
+</LinearLayout>
+<!-- Android so weird sometimes - check this out: 
+	http://stackoverflow.com/questions/11050817/your-content-must-have-a-listview-whose-id-attribute-is-android-r-id-list
+-->

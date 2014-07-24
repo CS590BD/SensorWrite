@@ -89,6 +89,9 @@ public class DataTrainingActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		//handle presses on action bar items
 		switch(item.getItemId()) {
+			case R.id.action_graph:
+				openGraph();
+				return true;
 			case R.id.action_edit:
 				openWrite();
 				return true;
@@ -102,7 +105,10 @@ public class DataTrainingActivity extends Activity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+	private void openGraph() {
+		Intent intent = new Intent(DataTrainingActivity.this, HBaseRowActivity.class);
+	    startActivity(intent);
+	}
 	private void openWrite() {
 		Intent intent = new Intent(DataTrainingActivity.this, MainActivity.class);
 	    startActivity(intent);
@@ -122,16 +128,26 @@ public class DataTrainingActivity extends Activity {
 			public void onClick(View v) {
 				//if data is captured, try to store it
 				if(receivedData.toString().length() > 0) {
-					String character = selectedCharacter.getText().toString();
-					RestfulGestureData record = new RestfulGestureData(DataTrainingActivity.this, character); //sets family internally
-					record.value = receivedData.toString();
-					record.tableName = "characters";
-					record.row = DataTrainingActivity.this.getResources().getString(R.string.user);
-					record.qualifier = character;
-					record.method = "post";
-					String url = record.toRestfulUrl();
-					String value = record.value;
-					new HttpAsyncTask(DataTrainingActivity.this, url).execute("post", value);
+					Context context = DataTrainingActivity.this;
+					String method = "post";
+					String table = "characters";
+					String row = getResources().getString(R.string.user);
+					String family;
+					String qualifier = selectedCharacter.getText().toString();
+					String value = receivedData.toString();
+					//set family
+					char c = qualifier.charAt(0);
+					if(Character.isUpperCase(c)) {
+						family = "capital";
+					} else if (Character.isLowerCase(c)) {
+						family = "lowercase";
+					} else if (Character.isDigit(c)) {
+						family = "numeric";
+					} else {
+						family = "punctuation";
+					}
+					String url = new RestfulGestureData(context, method, table, row, family, qualifier, value).toRestfulUrl();
+					new HttpAsyncTask(context, url).execute(method, value);
 					Log.wtf("url", url);
 				}
 			}

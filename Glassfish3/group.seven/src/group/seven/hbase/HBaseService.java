@@ -84,6 +84,39 @@ public class HBaseService {
 	}
 	
 	/**
+	 * GET SINGLE ROW
+	 * http://localhost:8080/group.seven/rest/hbase/get/characters/james
+	 * 
+	 * @param table
+	 * @param row
+	 * @return
+	 */
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/get/{tablename:.+}/{row:.+}")
+	public String getRow(
+			@PathParam("tablename") String table,
+			@PathParam("row") String row) {
+		String line = "{'status':'init'}";
+		Configuration config = getHBaseConfiguration();
+		try {
+			HTable ht = new HTable(config, table);
+			Get get = new Get(Bytes.toBytes(row));
+			Result result = ht.get(get);
+			line = "";
+		    for(KeyValue keyValue : result.list()) {
+		    	//keyValue.toString() == james/capital:M/1406091985672/Put/vlen=1836/ts=0
+		    	String qualifier = keyValue.toString().split(":")[1].split("/")[0];
+		    	String value = Bytes.toString(keyValue.getValue());
+		        line += (qualifier + ":" + value + "===");
+		    }
+		} catch (IOException ex) {
+			line = exceptionToJson(ex);
+		}
+		return line;
+	}
+	
+	/**
 	 * GET CELL LATEST VERSION ONLY
 	 * http://localhost:8080/group.seven/rest/hbase/get/characters/james/capital/A
 	 * 
@@ -187,7 +220,8 @@ public class HBaseService {
 	/**
 	 * UPDATE AT QUALIFIER
 	 * http://localhost:8080/group.seven/rest/hbase/post/tablename/row/family/qualifier
-	 * http://localhost:8080/group.seven/rest/hbase/post/foodgroups/dole/fruit/apple
+	 * http://localhost:8080/group.seven/rest/hbase/post/characters/james/capital/A
+	 * 
 	 * @param value - passed in the header message
 	 * @param table
 	 * @param row
@@ -316,9 +350,3 @@ public class HBaseService {
 		return json;
 	}
 }
-
-/*
- * 
- * 
- * 
- */ 

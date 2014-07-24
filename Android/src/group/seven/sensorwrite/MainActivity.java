@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 		//handle presses on action bar items
 		switch(item.getItemId()) {
 			case R.id.action_graph:
-				openGraphs();
+				openGraph();
 				return true;
 			case R.id.action_edit:
 				//do nothing - already here
@@ -44,8 +44,8 @@ public class MainActivity extends Activity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	private void openGraphs() {
-		Intent intent = new Intent(MainActivity.this, GraphingActivity.class);
+	private void openGraph() {
+		Intent intent = new Intent(MainActivity.this, HBaseRowActivity.class);
 	    startActivity(intent);
 	}
 	private void openStorage() {

@@ -28,10 +28,10 @@ public final class R {
         public static final int ic_launcher=0x7f020003;
     }
     public static final class id {
-        public static final int action_edit=0x7f080027;
-        public static final int action_graph=0x7f080026;
+        public static final int action_edit=0x7f080026;
+        public static final int action_graph=0x7f080028;
         public static final int action_settings=0x7f080025;
-        public static final int action_storage=0x7f080028;
+        public static final int action_storage=0x7f080027;
         public static final int btnDiscard=0x7f080004;
         public static final int btnSave=0x7f080003;
         public static final int chart=0x7f080023;
@@ -73,7 +73,8 @@ public final class R {
     public static final class layout {
         public static final int activity_datatraining=0x7f030000;
         public static final int activity_graphing=0x7f030001;
-        public static final int activity_main=0x7f030002;
+        public static final int activity_hbaserow=0x7f030002;
+        public static final int activity_main=0x7f030003;
     }
     public static final class menu {
         public static final int main=0x7f070000;
