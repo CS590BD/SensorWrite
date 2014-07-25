@@ -28,12 +28,13 @@ public final class R {
         public static final int ic_launcher=0x7f020003;
     }
     public static final class id {
-        public static final int action_edit=0x7f080029;
-        public static final int action_graph=0x7f08002b;
-        public static final int action_settings=0x7f080028;
-        public static final int action_storage=0x7f08002a;
+        public static final int action_edit=0x7f08002a;
+        public static final int action_graph=0x7f08002c;
+        public static final int action_settings=0x7f080029;
+        public static final int action_storage=0x7f08002b;
         public static final int btnDiscard=0x7f080004;
         public static final int btnSave=0x7f080003;
+        public static final int btnTestC=0x7f080028;
         public static final int chart=0x7f080023;
         public static final int lblA=0x7f080005;
         public static final int lblAccelerationX=0x7f080000;
