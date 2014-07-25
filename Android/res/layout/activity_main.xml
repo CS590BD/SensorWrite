@@ -8,7 +8,7 @@
     android:paddingTop="@dimen/activity_vertical_margin" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/lblWriteSomething"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -18,7 +18,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/lblZ"
+        android:id="@+id/lblMainZ"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -28,20 +28,20 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/lblY"
+        android:id="@+id/lblMainY"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/lblZ"
+        android:layout_above="@+id/lblMainZ"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:text="@string/lblY"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/lblX"
+        android:id="@+id/lblMainX"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/lblY"
+        android:layout_above="@+id/lblMainY"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:text="@string/lblX"

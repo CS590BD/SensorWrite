@@ -9,7 +9,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DataTrainingActivity extends Activity {
 	private ConnectionServiceReceiver receiver;
@@ -129,20 +129,12 @@ public class DataTrainingActivity extends Activity {
 			String contents = "";
 			FileWriter filewriter = new FileWriter(path + file, true);
 		    String[] lines = value.split("\n");
-		    
-		    //first item in sequence doesn't start with ;
-			String[] values = lines[0].split("\t");
-			String x = values[1];
-			String y = values[2];
-			String z = values[3];
-		    contents += "[ " + x + "\t" + y + "\t" + z + " ]";
-		    //separate remaining sequence by ;
-		    for(int i = 1; i < lines.length; i++) {
-				values = lines[i].split("\t");
-				x = values[1];
-				y = values[2];
-				z = values[3];
-				contents += " ; [ " + x + "\t" + y + "\t" + z + " ]";
+		    for(int i = 0; i < lines.length; i++) {
+		    	String[] values = lines[i].split("\t");
+		    	String x = values[1];
+		    	String y = values[2];
+		    	String z = values[3];
+				contents += "[ " + x + "\t" + y + "\t" + z + " ]  ; ";
 		    }
 		    filewriter.write(contents + "\n");
 		    filewriter.close();
@@ -185,7 +177,8 @@ public class DataTrainingActivity extends Activity {
 					}
 					writeSequence(new File(qualifier + ".seq"), value);
 					String url = new RestfulGestureData(context, method, table, row, family, qualifier, value).toRestfulUrl();
-					new HttpAsyncTask(context, url).execute(method, value);
+					//new HttpAsyncTask(context, url).execute(method, value);
+					Toast.makeText(DataTrainingActivity.this, "file saved", Toast.LENGTH_SHORT).show();;
 					Log.wtf("url", url);
 				}
 			}
