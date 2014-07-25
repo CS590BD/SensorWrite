@@ -144,7 +144,7 @@ public class DataTrainingActivity extends Activity {
 				z = values[3];
 				contents += " ; [ " + x + "\t" + y + "\t" + z + " ]";
 		    }
-		    filewriter.write(contents);
+		    filewriter.write(contents + "\n");
 		    filewriter.close();
 		} catch (IOException exception) {
 			//do nothing?
