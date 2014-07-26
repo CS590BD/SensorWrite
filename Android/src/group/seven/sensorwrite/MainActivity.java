@@ -3,7 +3,6 @@ package group.seven.sensorwrite;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
@@ -11,7 +10,10 @@ import java.util.List;
 import java.util.Random;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -31,16 +33,45 @@ import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
 
 public class MainActivity extends Activity {
-	
+	//connection receiver
+	private ConnectionServiceReceiver receiver;
 	private StringBuilder receivedData;
 	
-	String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!",",","."};
+	//buttons
+	Button testC;
+	
+	//labels
+	private TextView lblMainX, lblMainY, lblMainZ, lblWriteSomething;
 
-	HashMap<String, Hmm<ObservationVector>> learnMap;
+	//motion sensing
+	private final String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!",",","."};
+	private HashMap<String, Hmm<ObservationVector>> learnMap;
+	
+	/**
+	 * BROADCAST RECEIVER
+	 * sender: ConnectionService.class
+	 */
+	public class ConnectionServiceReceiver extends BroadcastReceiver {
+		public static final String PROCESS_RESPONSE = "group.seven.sensorwrite.intent.action.PROCESS_RESPONSE";
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String X = intent.getStringExtra(ConnectionService.X);
+			String Y = intent.getStringExtra(ConnectionService.Y);
+			String Z = intent.getStringExtra(ConnectionService.Z);
+			long timestamp = intent.getLongExtra("TIMESTAMP", System.currentTimeMillis());
+			lblMainX.setText(X);
+			lblMainY.setText(Y);
+			lblMainZ.setText(Z);
+			receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
+		}
+	}
 
 	//foreach file
 		//if file has contents
 			//train it
+	/**
+	 * 
+	 */
 	public void train() {
 		Log.wtf("system.out", "train()");
 		learnMap = new HashMap<String, Hmm<ObservationVector>>();
@@ -89,6 +120,12 @@ public class MainActivity extends Activity {
 		tv.setText("trained");
 	}
 	
+	/**
+	 * TRAIN
+	 * @param seqfilename
+	 * @return
+	 * @throws Exception
+	 */
 	public String test(File seqfilename) throws Exception{
         Reader testReader = new FileReader(seqfilename);
         List<List<ObservationVector>> testSequences = ObservationSequencesReader.readSequences(new ObservationVectorReader(), testReader);
@@ -108,39 +145,28 @@ public class MainActivity extends Activity {
 	        }
         }
         Log.wtf("probability", mostLikelyCharacter + ": " + probability);
+        if("write something".equalsIgnoreCase(lblWriteSomething.getText().toString())) {
+        	lblWriteSomething.setText(mostLikelyCharacter);
+        } else {
+        	lblWriteSomething.append(mostLikelyCharacter);
+        }
         return mostLikelyCharacter;
     }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		Log.wtf("system.out", "MainActivity loaded");
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		train();
-		
-		Button testC = (Button)findViewById(R.id.btnTestC);
+	/**
+	 * REGISTER UI
+	 */
+	private void registerUI() {
+		lblWriteSomething = (TextView)findViewById(R.id.lblWriteSomething);
+		lblMainX = (TextView)findViewById(R.id.lblMainX);
+		lblMainY = (TextView)findViewById(R.id.lblMainY);
+		lblMainZ = (TextView)findViewById(R.id.lblMainZ);
+		testC = (Button)findViewById(R.id.btnTestC);
 		testC.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				Log.wtf("system.out", "TestC clicked");
-				receivedData = new StringBuilder();
-				String x = "";
-				String y = "";
-				String z = "";
-				long timestamp = System.currentTimeMillis();
-				for(int i = 0; i < 40; i++) {
-					x = Float.toString(new Random().nextFloat());
-					y = Float.toString(new Random().nextFloat());
-					z = Float.toString(new Random().nextFloat());
-					timestamp += 20; //store 20 ms difference each time (makes better graphs)
-					receivedData.append(timestamp);
-					receivedData.append("\t" + x);
-					receivedData.append("\t" + y);
-					receivedData.append("\t" + z);
-					receivedData.append("\n");
-				}
-				boolean isTempWritten = SequenceFileWriter.writeSequence(new File("temp.seq"), receivedData.toString());
+				Log.wtf("system.out", "Test clicked");
+				boolean isTempWritten = SequenceFileWriter.writeTempSequence(new File("temp.seq"), receivedData.toString());
 				String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
 				String fileName = "temp.seq";
 				String fileAndPath = directoryPath + "/" + fileName;
@@ -149,8 +175,58 @@ public class MainActivity extends Activity {
 				} catch (Exception ex) {
 					Log.wtf("exception", ex.getMessage());
 				}
+				receivedData = new StringBuilder();
 			}
 		});
+	}
+	/**
+	 * FAKE TEST
+	 */
+	private void fakeTest() {
+		Log.wtf("system.out", "TestC clicked");
+		receivedData = new StringBuilder();
+		String x = "";
+		String y = "";
+		String z = "";
+		long timestamp = System.currentTimeMillis();
+		for(int i = 0; i < 40; i++) {
+			x = Float.toString(new Random().nextFloat());
+			y = Float.toString(new Random().nextFloat());
+			z = Float.toString(new Random().nextFloat());
+			timestamp += 20; //store 20 ms difference each time (makes better graphs)
+			receivedData.append(timestamp);
+			receivedData.append("\t" + x);
+			receivedData.append("\t" + y);
+			receivedData.append("\t" + z);
+			receivedData.append("\n");
+		}
+		boolean isTempWritten = SequenceFileWriter.writeSequence(new File("temp.seq"), receivedData.toString());
+		String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
+		String fileName = "temp.seq";
+		String fileAndPath = directoryPath + "/" + fileName;
+		try {
+			test(new File(fileAndPath));
+		} catch (Exception ex) {
+			Log.wtf("exception", ex.getMessage());
+		}
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		Log.wtf("system.out", "MainActivity loaded");
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		train();
+		
+		receivedData = new StringBuilder();
+		registerUI();
+
+		Intent intent = new Intent(MainActivity.this, ConnectionService.class);
+		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
+		filter.addCategory(Intent.CATEGORY_DEFAULT);
+		receiver = new ConnectionServiceReceiver();
+		registerReceiver(receiver, filter);
+		startService(intent);
 	}
 
 	@Override
