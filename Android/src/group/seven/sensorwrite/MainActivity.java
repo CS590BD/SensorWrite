@@ -98,10 +98,12 @@ public class MainActivity extends Activity {
         String mostLikelyCharacter = "?"; //not in the set ... we have a problem if this is the result
         for(String character : characters) {
 	        for (int i = 0; i < testSequences.size(); i++) {
-	        	double thisProbability = learnMap.get(character).probability(testSequences.get(i));
-	        	if(thisProbability > probability) {
-	        		probability = thisProbability;
-	        		mostLikelyCharacter = character;
+	        	if(learnMap.containsKey(character)) {
+		        	double thisProbability = learnMap.get(character).probability(testSequences.get(i));
+		        	if(thisProbability > probability) {
+		        		probability = thisProbability;
+		        		mostLikelyCharacter = character;
+		        	}
 	        	}
 	        }
         }

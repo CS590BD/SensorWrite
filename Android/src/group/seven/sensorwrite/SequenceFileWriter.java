@@ -13,12 +13,13 @@ public class SequenceFileWriter {
 			String contents = "";
 			FileWriter filewriter = new FileWriter(path + file, true);
 		    String[] lines = value.split("\n");
+		    
 		    for(int i = 0; i < lines.length; i++) {
 		    	String[] values = lines[i].split("\t");
 		    	String x = values[1];
 		    	String y = values[2];
 		    	String z = values[3];
-				contents += "[ " + x + "\t" + y + "\t" + z + " ]  ; ";
+				contents += "[ " + x + "\t" + y + "\t" + z + " ] ; ";
 		    }
 			    filewriter.write(contents + "\n");
 			    filewriter.close();

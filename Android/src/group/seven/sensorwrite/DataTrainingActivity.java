@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,6 +43,25 @@ public class DataTrainingActivity extends Activity {
 	//for testing with fake data (click 3 times to trigger)
 	int questionMarkClickCount = 0;
 	
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		Log.wtf("system.out", "DataTrainingActivity loaded");
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_datatraining);
+		
+		receivedData = new StringBuilder();
+		registerUI();
+		disableButtons();
+
+		Intent intent = new Intent(DataTrainingActivity.this, ConnectionService.class);
+		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
+		filter.addCategory(Intent.CATEGORY_DEFAULT);
+		receiver = new ConnectionServiceReceiver();
+		registerReceiver(receiver, filter);
+		startService(intent);
+	}
+	
 	/**
 	 * BROADCAST RECEIVER
 	 * sender: ConnectionService.class
@@ -59,26 +79,6 @@ public class DataTrainingActivity extends Activity {
 			lblAccelerometerZ.setText(Z);
 			receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
 		}
-	}
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		Log.wtf("system.out", "DataTrainingActivity loaded");
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_datatraining);
-		
-		receivedData = new StringBuilder();
-		registerUI();
-		disableButtons();
-
-		/*
-		Intent intent = new Intent(DataTrainingActivity.this, ConnectionService.class);
-		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
-		filter.addCategory(Intent.CATEGORY_DEFAULT);
-		receiver = new ConnectionServiceReceiver();
-		registerReceiver(receiver, filter);
-		startService(intent);
-		*/
 	}
 	
 	@Override
@@ -119,31 +119,6 @@ public class DataTrainingActivity extends Activity {
 	}
 	
 	/**
-	 * WRITE A SEQUENCE FILE
-	 * @param file
-	 * @param value
-	 */
-	private void writeSequence(File file, String value) {
-		String path = Environment.getExternalStorageDirectory() + "/SensorWrite/";
-		try {
-			String contents = "";
-			FileWriter filewriter = new FileWriter(path + file, true);
-		    String[] lines = value.split("\n");
-		    for(int i = 0; i < lines.length; i++) {
-		    	String[] values = lines[i].split("\t");
-		    	String x = values[1];
-		    	String y = values[2];
-		    	String z = values[3];
-				contents += "[ " + x + "\t" + y + "\t" + z + " ]  ; ";
-		    }
-		    filewriter.write(contents + "\n");
-		    filewriter.close();
-		} catch (IOException exception) {
-			//do nothing?
-		}
-	}
-	
-	/**
 	 * REGISTER UI
 	 * 
 	 * Creates UI objects and register their listeners.
@@ -175,10 +150,11 @@ public class DataTrainingActivity extends Activity {
 					} else {
 						family = "punctuation";
 					}
-					writeSequence(new File(qualifier + ".seq"), value);
+					SequenceFileWriter.writeSequence(new File(qualifier + ".seq"), value);
 					String url = new RestfulGestureData(context, method, table, row, family, qualifier, value).toRestfulUrl();
 					//new HttpAsyncTask(context, url).execute(method, value);
 					Toast.makeText(DataTrainingActivity.this, "file saved", Toast.LENGTH_SHORT).show();;
+					receivedData = new StringBuilder();
 					Log.wtf("url", url);
 				}
 			}
