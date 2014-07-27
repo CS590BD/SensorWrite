@@ -1,3 +1,5 @@
+//http://www.androidhive.info/2012/04/android-downloading-file-by-showing-progress-bar/
+
 package group.seven.sensorwrite;
 
 import java.io.BufferedReader;
@@ -10,10 +12,13 @@ import java.util.List;
 import java.util.Random;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -38,10 +43,16 @@ public class MainActivity extends Activity {
 	private StringBuilder receivedData;
 	
 	//buttons
-	Button testC;
+	Button btnTest;
 	
 	//labels
 	private TextView lblMainX, lblMainY, lblMainZ, lblWriteSomething;
+	
+	//progress dialog
+	private ProgressDialog progress;
+	
+	//0 = horizontal progress bar
+	public static final int progressBarType = 0;
 
 	//motion sensing
 	private final String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!",",","."};
@@ -65,63 +76,9 @@ public class MainActivity extends Activity {
 			receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
 		}
 	}
-
-	//foreach file
-		//if file has contents
-			//train it
-	/**
-	 * 
-	 */
-	public void train() {
-		Log.wtf("system.out", "train()");
-		learnMap = new HashMap<String, Hmm<ObservationVector>>();
-		//foreach file
-		for(String character : characters) {
-			try {
-				//if file has contents
-				String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
-				String fileName = character + ".seq";
-				String filePath = directoryPath + "/" + fileName;
-				BufferedReader br = new BufferedReader(new FileReader(filePath));
-				if (br.readLine() != null) { //file has contents
-					Log.wtf("train()", "YES - " + fileName + " has content");
-					//train it
-					Boolean exception = false;
-					int x = 10; //why 10? i think we are trying to read 10 lines from the file
-					while(!exception && x > 0) {
-						Log.wtf("train()", "entering while loop");
-						try {
-							OpdfMultiGaussianFactory initFactoryPunch = new OpdfMultiGaussianFactory(3); //3 dimensions because x y z
-							Reader learnReaderPunch = new FileReader(new File (directoryPath, fileName));
-							List<List<ObservationVector>> learnSequencesPunch = ObservationSequencesReader.readSequences(new ObservationVectorReader(), learnReaderPunch);
-							learnReaderPunch.close();
-							KMeansLearner<ObservationVector> kMeansLearnerPunch = new KMeansLearner<ObservationVector>(x, initFactoryPunch, learnSequencesPunch);
-							// Create an estimation of the HMM (initHmm) using one iteration of the
-							// k-Means algorithm
-							Hmm<ObservationVector> initHmmPunch = kMeansLearnerPunch.iterate();
-							// Use BaumWelchLearner to create the HMM (learntHmm) from initHmm
-							BaumWelchLearner baumWelchLearnerPunch = new BaumWelchLearner();
-							learnMap.put(character, baumWelchLearnerPunch.learn(initHmmPunch, learnSequencesPunch));
-							exception=true;
-							//System.out.println(x);
-						} catch(Exception ex) {
-							x--; //what happens in this exception block? Is the file missing lines?
-							Log.wtf("exception", ex.getMessage());
-						}
-					}
-				} else { 
-					Log.wtf("train()", "NO - " + fileName + " does not have content");
-				}
-			} catch (IOException ex) {
-				//this is prevented by file creation in splash screen
-			}
-		}
-		TextView tv = (TextView)findViewById(R.id.lblMainX);
-		tv.setText("trained");
-	}
 	
 	/**
-	 * TRAIN
+	 * TEST
 	 * @param seqfilename
 	 * @return
 	 * @throws Exception
@@ -161,24 +118,29 @@ public class MainActivity extends Activity {
 		lblMainX = (TextView)findViewById(R.id.lblMainX);
 		lblMainY = (TextView)findViewById(R.id.lblMainY);
 		lblMainZ = (TextView)findViewById(R.id.lblMainZ);
-		testC = (Button)findViewById(R.id.btnTestC);
-		testC.setOnClickListener(new OnClickListener() {
+		btnTest = (Button)findViewById(R.id.btnTest);
+		btnTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.wtf("system.out", "Test clicked");
-				boolean isTempWritten = SequenceFileWriter.writeTempSequence(new File("temp.seq"), receivedData.toString());
-				String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
-				String fileName = "temp.seq";
-				String fileAndPath = directoryPath + "/" + fileName;
-				try {
-					test(new File(fileAndPath));
-				} catch (Exception ex) {
-					Log.wtf("exception", ex.getMessage());
+				if(receivedData != null && receivedData.toString().length() > 0) {
+					Log.wtf("system.out", "Test clicked");
+					boolean isTempWritten = SequenceFileWriter.writeTempSequence(new File("temp.seq"), receivedData.toString());
+					String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
+					String fileName = "temp.seq";
+					String fileAndPath = directoryPath + "/" + fileName;
+					try {
+						test(new File(fileAndPath));
+					} catch (Exception ex) {
+						Log.wtf("exception", ex.getMessage());
+					}
+					receivedData = new StringBuilder();
+				} else {
+					fakeTest();
 				}
-				receivedData = new StringBuilder();
 			}
 		});
 	}
+	
 	/**
 	 * FAKE TEST
 	 */
@@ -200,7 +162,7 @@ public class MainActivity extends Activity {
 			receivedData.append("\t" + z);
 			receivedData.append("\n");
 		}
-		boolean isTempWritten = SequenceFileWriter.writeSequence(new File("temp.seq"), receivedData.toString());
+		boolean isTempWritten = SequenceFileWriter.writeTempSequence(new File("temp.seq"), receivedData.toString());
 		String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
 		String fileName = "temp.seq";
 		String fileAndPath = directoryPath + "/" + fileName;
@@ -216,17 +178,20 @@ public class MainActivity extends Activity {
 		Log.wtf("system.out", "MainActivity loaded");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		train();
+		
+		new TrainAsyncTask().execute();
 		
 		receivedData = new StringBuilder();
 		registerUI();
 
+		/*
 		Intent intent = new Intent(MainActivity.this, ConnectionService.class);
 		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
 		filter.addCategory(Intent.CATEGORY_DEFAULT);
 		receiver = new ConnectionServiceReceiver();
 		registerReceiver(receiver, filter);
 		startService(intent);
+		*/
 	}
 
 	@Override
@@ -257,6 +222,126 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	private int countFilesWithData() {
+		int count = 0;
+		for(String character : characters) {
+			try {
+				//if file has contents
+				String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
+				String fileName = character + ".seq";
+				String filePath = directoryPath + "/" + fileName;
+				BufferedReader br = new BufferedReader(new FileReader(filePath));
+				if (br.readLine() != null) { //file has contents
+					count++;
+				}
+			} catch (Exception ex) {
+				
+			}
+		}
+		return count;
+	}
+	
+	/**
+	 * SHOW PROGRESS
+	 */
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch(id) {
+			case progressBarType:
+				progress = new ProgressDialog(MainActivity.this);
+				progress.setMessage("Training data");
+				progress.setIndeterminate(false);
+				progress.setMax(countFilesWithData()); //progress should be one per file with data
+				progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				progress.setCancelable(false);
+				progress.show();
+				return progress;
+			default:
+				return null;
+		}
+	}
+	
+	/**
+	 * TRAIN ASYNC TASK
+	 */
+	public class TrainAsyncTask extends AsyncTask<String, String, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			int count = 0;
+			try {
+				Log.wtf("system.out", "train()");
+				learnMap = new HashMap<String, Hmm<ObservationVector>>();
+				//foreach file
+				for(String character : characters) {
+					try {
+						//if file has contents
+						String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
+						String fileName = character + ".seq";
+						String filePath = directoryPath + "/" + fileName;
+						BufferedReader br = new BufferedReader(new FileReader(filePath));
+						if (br.readLine() != null) { //file has contents
+							Log.wtf("train()", "YES - " + fileName + " has content");
+							//train it
+							Boolean exception = false;
+							int x = 10; //why 10? i think we are trying to read 10 lines from the file
+							while(!exception && x > 0) {
+								Log.wtf("train()", "entering while loop");
+								try {
+									OpdfMultiGaussianFactory initFactory = new OpdfMultiGaussianFactory(3); //3 dimensions because x y z
+									Reader learnReaderPunch = new FileReader(new File (directoryPath, fileName));
+									List<List<ObservationVector>> learnSequences = ObservationSequencesReader.readSequences(new ObservationVectorReader(), learnReaderPunch);
+									learnReaderPunch.close();
+									KMeansLearner<ObservationVector> kMeansLearner = new KMeansLearner<ObservationVector>(x, initFactory, learnSequences);
+									// Create an estimation of the HMM (initHmm) using one iteration of the
+									// k-Means algorithm
+									Hmm<ObservationVector> initHmm = kMeansLearner.iterate();
+									// Use BaumWelchLearner to create the HMM (learntHmm) from initHmm
+									BaumWelchLearner baumWelchLearner = new BaumWelchLearner();
+									learnMap.put(character, baumWelchLearner.learn(initHmm, learnSequences));
+									exception=true;
+									publishProgress(Integer.toString(++count));
+								} catch(Exception ex) {
+									x--; //what happens in this exception block? Is the file missing lines?
+									Log.wtf("exception", ex.getMessage());
+								}
+							}
+						} else { 
+							Log.wtf("train()", "NO - " + fileName + " does not have content");
+						}
+					} catch (IOException ex) {
+						//this is prevented by file creation in splash screen
+					}
+				}
+				//Only the original thread that created a view hierarchy can touch its views
+				//TextView tv = (TextView)findViewById(R.id.lblMainX);
+				//tv.setText("trained");
+			} catch (Exception ex) {
+				Log.wtf("TrainAsyncTask", ex.getMessage());
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			showDialog(progressBarType);
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			//super.onPostExecute(result);
+			dismissDialog(progressBarType);
+		}
+
+		@Override
+		protected void onProgressUpdate(String... values) {
+			//super.onProgressUpdate(values);
+			progress.setProgress(Integer.parseInt(values[0]));
+		}
+		
+	}
+	
 	private void openGraph() {
 		Intent intent = new Intent(MainActivity.this, HBaseRowActivity.class);
 		startActivity(intent);

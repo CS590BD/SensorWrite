@@ -34,7 +34,7 @@ public final class R {
         public static final int action_storage=0x7f08002b;
         public static final int btnDiscard=0x7f080004;
         public static final int btnSave=0x7f080003;
-        public static final int btnTestC=0x7f080028;
+        public static final int btnTest=0x7f080028;
         public static final int chart=0x7f080023;
         public static final int lblA=0x7f080005;
         public static final int lblAccelerationX=0x7f080000;

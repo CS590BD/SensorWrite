@@ -48,12 +48,12 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
-        android:id="@+id/btnTestC"
+        android:id="@+id/btnTest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lblWriteSomething"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="136dp"
-        android:text="Test C" />
+        android:text="Test" />
 
 </RelativeLayout>
