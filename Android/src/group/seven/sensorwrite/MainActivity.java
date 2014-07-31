@@ -38,24 +38,22 @@ import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
 
 public class MainActivity extends Activity {
+	
+	boolean started = false;
+	
 	//connection receiver
 	private ConnectionServiceReceiver receiver;
 	private StringBuilder receivedData;
-	
-	//buttons
-	Button btnTest;
 	
 	//labels
 	private TextView lblMainX, lblMainY, lblMainZ, lblWriteSomething;
 	
 	//progress dialog
 	private ProgressDialog progress;
-	
-	//0 = horizontal progress bar
-	public static final int progressBarType = 0;
+	public static final int progressBarType = 0; //0 = horizontal progress bar
 
 	//motion sensing
-	private final String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!",",","."};
+	private final String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!","_","."};
 	private HashMap<String, Hmm<ObservationVector>> learnMap;
 	
 	/**
@@ -66,14 +64,27 @@ public class MainActivity extends Activity {
 		public static final String PROCESS_RESPONSE = "group.seven.sensorwrite.intent.action.PROCESS_RESPONSE";
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String X = intent.getStringExtra(ConnectionService.X);
-			String Y = intent.getStringExtra(ConnectionService.Y);
-			String Z = intent.getStringExtra(ConnectionService.Z);
-			long timestamp = intent.getLongExtra("TIMESTAMP", System.currentTimeMillis());
-			lblMainX.setText(X);
-			lblMainY.setText(Y);
-			lblMainZ.setText(Z);
-			receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
+			if(intent.hasExtra(ConnectionService.X) && started == true) {
+				String X = intent.getStringExtra(ConnectionService.X);
+				String Y = intent.getStringExtra(ConnectionService.Y);
+				String Z = intent.getStringExtra(ConnectionService.Z);
+				long timestamp = intent.getLongExtra("TIMESTAMP", System.currentTimeMillis());
+				lblMainX.setText(X);
+				lblMainY.setText(Y);
+				lblMainZ.setText(Z);
+				receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
+			} else if (intent.hasExtra(ConnectionService.DELETE_COMMAND) && started == true){
+				deleteCharacter();
+			} else if (intent.hasExtra(ConnectionService.TEST_COMMAND) && started == true && receivedData.toString().length() > 0 && receivedData != null) {
+				setTempFileAndTestIt();
+			}
+		}
+	}
+	private void deleteCharacter() {
+		String label = lblWriteSomething.getText().toString().trim();
+		if(label.length() != 0) {
+		    label  = label.substring(0, label.length() - 1);
+		    lblWriteSomething.setText (label);
 		}
 	}
 	
@@ -87,7 +98,6 @@ public class MainActivity extends Activity {
         Reader testReader = new FileReader(seqfilename);
         List<List<ObservationVector>> testSequences = ObservationSequencesReader.readSequences(new ObservationVectorReader(), testReader);
         testReader.close();
-        short gesture; // punch = 1, scrolldown = 2, send = 3
         double probability = 0; //start low, aim high (max = 1), to be determined:
         String mostLikelyCharacter = "?"; //not in the set ... we have a problem if this is the result
         for(String character : characters) {
@@ -118,27 +128,18 @@ public class MainActivity extends Activity {
 		lblMainX = (TextView)findViewById(R.id.lblMainX);
 		lblMainY = (TextView)findViewById(R.id.lblMainY);
 		lblMainZ = (TextView)findViewById(R.id.lblMainZ);
-		btnTest = (Button)findViewById(R.id.btnTest);
-		btnTest.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(receivedData != null && receivedData.toString().length() > 0) {
-					Log.wtf("system.out", "Test clicked");
-					boolean isTempWritten = SequenceFileWriter.writeTempSequence(new File("temp.seq"), receivedData.toString());
-					String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
-					String fileName = "temp.seq";
-					String fileAndPath = directoryPath + "/" + fileName;
-					try {
-						test(new File(fileAndPath));
-					} catch (Exception ex) {
-						Log.wtf("exception", ex.getMessage());
-					}
-					receivedData = new StringBuilder();
-				} else {
-					fakeTest();
-				}
-			}
-		});
+	}
+	public void setTempFileAndTestIt() {
+		boolean isTempWritten = SequenceFileWriter.writeTempSequence(new File("temp.seq"), receivedData.toString());
+		String directoryPath = Environment.getExternalStorageDirectory() + "/SensorWrite";
+		String fileName = "temp.seq";
+		String fileAndPath = directoryPath + "/" + fileName;
+		try {
+			test(new File(fileAndPath));
+		} catch (Exception ex) {
+			Log.wtf("exception", ex.getMessage());
+		}
+		receivedData = new StringBuilder();
 	}
 	
 	/**
@@ -184,14 +185,12 @@ public class MainActivity extends Activity {
 		receivedData = new StringBuilder();
 		registerUI();
 
-		/*
 		Intent intent = new Intent(MainActivity.this, ConnectionService.class);
 		IntentFilter filter = new IntentFilter(ConnectionServiceReceiver.PROCESS_RESPONSE);
 		filter.addCategory(Intent.CATEGORY_DEFAULT);
 		receiver = new ConnectionServiceReceiver();
 		registerReceiver(receiver, filter);
 		startService(intent);
-		*/
 	}
 
 	@Override
@@ -284,14 +283,14 @@ public class MainActivity extends Activity {
 							Log.wtf("train()", "YES - " + fileName + " has content");
 							//train it
 							Boolean exception = false;
-							int x = 10; //why 10? i think we are trying to read 10 lines from the file
+							int x = 10; //number of characteristics: likely different per training
 							while(!exception && x > 0) {
 								Log.wtf("train()", "entering while loop");
 								try {
 									OpdfMultiGaussianFactory initFactory = new OpdfMultiGaussianFactory(3); //3 dimensions because x y z
-									Reader learnReaderPunch = new FileReader(new File (directoryPath, fileName));
-									List<List<ObservationVector>> learnSequences = ObservationSequencesReader.readSequences(new ObservationVectorReader(), learnReaderPunch);
-									learnReaderPunch.close();
+									Reader learnReader = new FileReader(new File (directoryPath, fileName));
+									List<List<ObservationVector>> learnSequences = ObservationSequencesReader.readSequences(new ObservationVectorReader(), learnReader);
+									learnReader.close();
 									KMeansLearner<ObservationVector> kMeansLearner = new KMeansLearner<ObservationVector>(x, initFactory, learnSequences);
 									// Create an estimation of the HMM (initHmm) using one iteration of the
 									// k-Means algorithm
@@ -332,6 +331,7 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(String result) {
 			//super.onPostExecute(result);
 			dismissDialog(progressBarType);
+			started = true;
 		}
 
 		@Override

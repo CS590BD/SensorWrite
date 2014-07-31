@@ -34,7 +34,7 @@ public class DataTrainingActivity extends Activity {
 	TextView lblAccelerometerX, lblAccelerometerY, lblAccelerometerZ;
 	TextView lblA, lblB, lblC, lblD, lblE, lblF, lblG, lblH, lblI, lblJ, lblK, lblL, lblM, 
 		lblN, lblO, lblP, lblQ, lblR, lblS, lblT, lblU, lblV, lblW, lblX, lblY, lblZ,
-		lblExclamationPoint, lblPeriod, lblComma, lblQuestionMark;
+		lblExclamationPoint, lblPeriod, lblSpace, lblQuestionMark;
 	
 	//reference the current and previous characters
 	TextView selectedCharacter;
@@ -70,14 +70,16 @@ public class DataTrainingActivity extends Activity {
 		public static final String PROCESS_RESPONSE = "group.seven.sensorwrite.intent.action.PROCESS_RESPONSE";
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String X = intent.getStringExtra(ConnectionService.X);
-			String Y = intent.getStringExtra(ConnectionService.Y);
-			String Z = intent.getStringExtra(ConnectionService.Z);
-			long timestamp = intent.getLongExtra("TIMESTAMP", System.currentTimeMillis());
-			lblAccelerometerX.setText(X);
-			lblAccelerometerY.setText(Y);
-			lblAccelerometerZ.setText(Z);
-			receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
+			if(intent.hasExtra(ConnectionService.X)) {
+				String X = intent.getStringExtra(ConnectionService.X);
+				String Y = intent.getStringExtra(ConnectionService.Y);
+				String Z = intent.getStringExtra(ConnectionService.Z);
+				long timestamp = intent.getLongExtra("TIMESTAMP", System.currentTimeMillis());
+				lblAccelerometerX.setText(X);
+				lblAccelerometerY.setText(Y);
+				lblAccelerometerZ.setText(Z);
+				receivedData.append(timestamp + "\t" + X + "\t" + Y + "\t" + Z + "\n");
+			}
 		}
 	}
 	
@@ -198,7 +200,7 @@ public class DataTrainingActivity extends Activity {
 		lblZ = (TextView)findViewById(R.id.lblZ);
 		lblExclamationPoint = (TextView)findViewById(R.id.lblExclamationPoint);
 		lblPeriod = (TextView)findViewById(R.id.lblPeriod);
-		lblComma = (TextView)findViewById(R.id.lblComma);
+		lblSpace = (TextView)findViewById(R.id.lblSpace);
 		lblQuestionMark = (TextView)findViewById(R.id.lblQuestionMark);	
 		lblA.setOnClickListener(lblClickListener);
 		lblB.setOnClickListener(lblClickListener);
@@ -228,7 +230,7 @@ public class DataTrainingActivity extends Activity {
 		lblZ.setOnClickListener(lblClickListener);
 		lblExclamationPoint.setOnClickListener(lblClickListener);
 		lblPeriod.setOnClickListener(lblClickListener);
-		lblComma.setOnClickListener(lblClickListener);
+		lblSpace.setOnClickListener(lblClickListener);
 		lblQuestionMark.setOnClickListener(questionMarkClickListener);
 	}
 	

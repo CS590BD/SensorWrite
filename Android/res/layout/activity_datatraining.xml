@@ -350,14 +350,14 @@
             android:text="."
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <TextView
-            android:id="@+id/lblComma"
+            android:id="@+id/lblSpace"
             android:gravity="center"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:padding="10dip"
             android:layout_margin="4dip"
             android:layout_weight="1"
-            android:text=","
+            android:text="_"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <TextView
             android:id="@+id/lblQuestionMark"

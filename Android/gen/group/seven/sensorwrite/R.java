@@ -28,13 +28,12 @@ public final class R {
         public static final int ic_launcher=0x7f020003;
     }
     public static final class id {
-        public static final int action_edit=0x7f08002a;
-        public static final int action_graph=0x7f08002c;
-        public static final int action_settings=0x7f080029;
-        public static final int action_storage=0x7f08002b;
+        public static final int action_edit=0x7f080029;
+        public static final int action_graph=0x7f08002b;
+        public static final int action_settings=0x7f080028;
+        public static final int action_storage=0x7f08002a;
         public static final int btnDiscard=0x7f080004;
         public static final int btnSave=0x7f080003;
-        public static final int btnTest=0x7f080028;
         public static final int chart=0x7f080023;
         public static final int lblA=0x7f080005;
         public static final int lblAccelerationX=0x7f080000;
@@ -42,7 +41,6 @@ public final class R {
         public static final int lblAccelerationZ=0x7f080002;
         public static final int lblB=0x7f080006;
         public static final int lblC=0x7f080007;
-        public static final int lblComma=0x7f080021;
         public static final int lblD=0x7f080008;
         public static final int lblE=0x7f080009;
         public static final int lblExclamationPoint=0x7f08001f;
@@ -65,6 +63,7 @@ public final class R {
         public static final int lblQuestionMark=0x7f080022;
         public static final int lblR=0x7f080016;
         public static final int lblS=0x7f080017;
+        public static final int lblSpace=0x7f080021;
         public static final int lblT=0x7f080018;
         public static final int lblU=0x7f080019;
         public static final int lblV=0x7f08001a;

@@ -21,10 +21,13 @@ import android.util.SparseArray;
 public class ConnectionService extends IntentService implements
 		BluetoothAdapter.LeScanCallback {
 
+	//intent extras
 	public static final String X = "X";
 	public static final String Y = "Y";
 	public static final String Z = "Z";
 	public static final long TIMESTAMP = System.currentTimeMillis();
+	public static final String DELETE_COMMAND = "DELETE_COMMAND";
+	public static final String TEST_COMMAND = "TEST_COMMAND";
 
 	private BluetoothAdapter mBluetoothAdapter;
 	private SparseArray<BluetoothDevice> mDevices;
@@ -186,6 +189,18 @@ public class ConnectionService extends IntentService implements
 					broadcastIntent.putExtra(Y, y);
 					broadcastIntent.putExtra(Z, z);
 					broadcastIntent.putExtra("TIMESTAMP", timestamp);
+					sendBroadcast(broadcastIntent);
+				} else if (state.equals(SimpleKeysStatus.OFF_ON)) { //backspace
+					Intent broadcastIntent = new Intent();
+					broadcastIntent.setAction(ConnectionServiceReceiver.PROCESS_RESPONSE);
+					broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+					broadcastIntent.putExtra(ConnectionService.DELETE_COMMAND, "DELETE_COMMAND");
+					sendBroadcast(broadcastIntent);
+				} else if (state.equals(SimpleKeysStatus.OFF_OFF)) { //call test() on ui
+					Intent broadcastIntent = new Intent();
+					broadcastIntent.setAction(ConnectionServiceReceiver.PROCESS_RESPONSE);
+					broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+					broadcastIntent.putExtra(ConnectionService.TEST_COMMAND, "TEST_COMMAND");
 					sendBroadcast(broadcastIntent);
 				}
 			}
