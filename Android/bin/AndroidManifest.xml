@@ -35,18 +35,22 @@
         </activity>
         <activity
             android:name="group.seven.sensorwrite.MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
         </activity>
         <activity
             android:name="group.seven.sensorwrite.DataTrainingActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
         </activity>
          <activity
             android:name="group.seven.sensorwrite.HBaseRowActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
         </activity>
         <activity
             android:name="group.seven.sensorwrite.GraphingActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:parentActivityName="group.seven.sensorwrite.HBaseRowActivity">
         </activity>

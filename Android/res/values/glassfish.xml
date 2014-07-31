@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="IP">10.205.1.123</string>
+    <string name="IP">10.205.1.99</string>
     <string name="Port">8080</string>
     <string name="Application">group.seven</string>
     <string name="MappingPattern">rest</string>

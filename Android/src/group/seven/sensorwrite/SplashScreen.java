@@ -16,7 +16,7 @@ public class SplashScreen extends Activity {
 	// Splash screen timer
 	private static int SPLASH_TIME_OUT = 1000;
 	
-	String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!",",",".","temp"};
+	String[] characters = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!","_",".","temp"};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
